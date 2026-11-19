@@ -94,3 +94,11 @@ test("rejects duplicate or unsafe legacy journal tags", t => {
   fs.writeFileSync(journalPath, JSON.stringify(journal));
   assert.throws(() => captureLegacyMigrationManifest(legacy), /Duplicate legacy migration tag/);
 });
+
+test("captures the repository's current legacy migration directory", () => {
+  const manifest = captureLegacyMigrationManifest(path.join(process.cwd(), "server", "db", "migrations"));
+  assert.ok(manifest.migrationCount > 0);
+  assert.equal(manifest.migrations.length, manifest.migrationCount);
+  assert.ok(manifest.migrations.every(item => /^[a-f0-9]{64}$/.test(item.sha256)));
+  assert.ok(manifest.snapshots.every(item => /^[a-f0-9]{64}$/.test(item.sha256)));
+});
