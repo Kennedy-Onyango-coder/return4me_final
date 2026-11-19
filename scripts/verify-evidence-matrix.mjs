@@ -86,7 +86,7 @@ for (const [n, row] of rows.entries()) {
   }
 }
 if (rows.length !== traceRows.length || new Set(ids).size !== ids.length || duplicates.length || errors.length) {
-  process.stderr.write(`Evidence matrix validation failed: rows=${rows.length}, traceability rows=${traceRows.length}, unique=${new Set(ids).size}, errors=${errors.length}\\n${errors.join('\\n')}\\n`);
+  process.stderr.write(`Evidence matrix validation failed: rows=${rows.length}, traceability rows=${traceRows.length}, unique=${new Set(ids).size}, errors=${errors.length}\n${errors.join('\n')}\n`);
   process.exit(1);
 }
-process.stdout.write(`Evidence matrix check passed: ${rows.length} requirement rows aligned to traceability; candidate paths exist; test coverage, independent acceptance and release evidence remain explicit.\\n`);
+process.stdout.write(`Evidence matrix check passed: ${rows.length} requirement rows aligned to traceability; candidate paths exist; test coverage, independent acceptance and release evidence remain explicit.\n`);
