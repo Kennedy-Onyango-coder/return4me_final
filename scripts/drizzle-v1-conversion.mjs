@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const MANIFEST_VERSION = 1;
-const MIGRATION_FOLDER_PATTERN = /^\\d{14}_[A-Za-z0-9_-]+$/;
+const MIGRATION_FOLDER_PATTERN = /^\d{14}_[A-Za-z0-9_-]+$/;
 
 function sha256(filePath) {
   return crypto.createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
@@ -59,7 +59,7 @@ export function captureLegacyMigrationManifest(migrationsDirectory) {
 
   const metaDirectory = path.join(directory, "meta");
   const snapshots = fs.readdirSync(metaDirectory, { withFileTypes: true })
-    .filter(entry => entry.isFile() && /^\\d{4}_snapshot\\.json$/.test(entry.name))
+    .filter(entry => entry.isFile() && /^\d{4}_snapshot\.json$/.test(entry.name))
     .map(entry => {
       const snapshotPath = path.join(metaDirectory, entry.name);
       readJson(snapshotPath, `Legacy snapshot ${entry.name}`);
@@ -169,25 +169,25 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToP
   try {
     if (command === "capture" && first && second) {
       const manifest = captureLegacyMigrationManifest(first);
-      fs.writeFileSync(path.resolve(second), `${JSON.stringify(manifest, null, 2)}\\n`, { flag: "wx" });
+      fs.writeFileSync(path.resolve(second), `${JSON.stringify(manifest, null, 2)}\n`, { flag: "wx" });
       process.stdout.write(
-        `Captured ${manifest.migrationCount} legacy migrations and ${manifest.snapshots.length} snapshots.\\n` +
-        `Manifest: ${path.resolve(second)}\\nNo database was contacted and no migration was applied.\\n`,
+        `Captured ${manifest.migrationCount} legacy migrations and ${manifest.snapshots.length} snapshots.\n` +
+        `Manifest: ${path.resolve(second)}\nNo database was contacted and no migration was applied.\n`,
       );
     } else if (command === "verify" && first && second) {
       const manifest = readJson(path.resolve(first), "Pre-conversion manifest");
       const result = verifyConvertedMigrationDirectory(manifest, second);
       process.stdout.write(
         `Drizzle v1 conversion inventory passed: ${result.migrationCount} migration folders; ` +
-        "all SQL files are byte-identical and all snapshots are valid JSON.\\n" +
-        "No database was contacted and no migration was applied.\\n",
+        "all SQL files are byte-identical and all snapshots are valid JSON.\n" +
+        "No database was contacted and no migration was applied.\n",
       );
     } else {
       usage();
       process.exitCode = 2;
     }
   } catch (error) {
-    process.stderr.write(`Drizzle v1 conversion inventory failed: ${error.message}\\n`);
+    process.stderr.write(`Drizzle v1 conversion inventory failed: ${error.message}\n`);
     process.exitCode = 1;
   }
 }
