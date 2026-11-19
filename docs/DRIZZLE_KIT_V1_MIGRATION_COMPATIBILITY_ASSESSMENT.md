@@ -24,6 +24,27 @@ The repository currently has 23 ordered SQL migrations, numbered `0000` through 
 
 The current `drizzle.config.ts` points Drizzle Kit at `server/db/schema.ts` and `server/db/migrations`, using the PostgreSQL dialect. The repository's migration verifier explicitly requires the flat numbered SQL files and the shared `meta/_journal.json`; it is a 0.x-layout verifier and would need a deliberate redesign if the format changes.
 
+## Repository ORM and schema surface reviewed
+
+The application database bootstrap in `server/db/index.ts` creates the ORM through `drizzle-orm/node-postgres`, using the `pg` `Pool` and the exported schema object. The configuration uses the PostgreSQL dialect and points to the same schema and migration directory.
+
+The reviewed `server/db/schema.ts` contains 76 `pgTable(...)` declarations and imports PostgreSQL column/table builders plus `sql` from Drizzle ORM. No `relations(...)` helper, `enableRLS`, `withRLS`, `getTableColumns` or `getColumns` occurrence was found in that schema file. This is a bounded observation about the schema file only; it is not a completed audit of every query and ORM API use in the server.
+
+The current schema file is approximately 74.6 KB and includes raw SQL expressions for partial indexes and other database expressions. These must be included in any v1 generated-snapshot and first-regeneration diff review. The schema was not regenerated under v1 during this assessment.
+
+## Existing migration verifier coverage and gap
+
+`scripts/verify-migrations.mjs` currently checks that:
+
+- `meta/_journal.json` exists and contains at least one entry;
+- journal `idx` values are contiguous from zero;
+- every journal tag has a corresponding flat `.sql` file; and
+- journal tags are unique.
+
+It does **not** compare migration SQL hashes against a baseline, validate the full SQL contents, prove that the snapshot chain is complete, or compare local migration history with a deployed database's migration metadata. It prints a local metadata success message only. Therefore, its current passing result must not be treated as proof that production and the repository have identical applied migration histories.
+
+A future v1 conversion must replace the 0.x-specific verifier deliberately. The replacement should validate one folder per migration, required `migration.sql` and `snapshot.json` files, stable unique folder identifiers, snapshot-chain integrity, preservation of each original SQL file, and consistency between local migration folders and a separately captured database-history inventory. The database-history comparison must remain read-only and must not be wired into ordinary CI using production credentials.
+
 ## Why Drizzle Kit 1.0.0-rc.5 is not a drop-in security fix
 
 The published 1.0 release-candidate migration format changes from flat SQL files plus a shared journal to one directory per migration containing `migration.sql` and `snapshot.json`. The documented upgrade requires the `drizzle-kit up` conversion step and a coordinated package upgrade; rc.5's Drizzle Kit also declares a `drizzle-orm >=1.0.0-rc.5` optional peer dependency.
