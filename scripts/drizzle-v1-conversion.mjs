@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const MANIFEST_VERSION = 1;
 const MIGRATION_FOLDER_PATTERN = /^\\d{14}_[A-Za-z0-9_-]+$/;
@@ -163,7 +164,7 @@ function usage() {
   );
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname)) {
+if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))) {
   const [command, first, second] = process.argv.slice(2);
   try {
     if (command === "capture" && first && second) {
