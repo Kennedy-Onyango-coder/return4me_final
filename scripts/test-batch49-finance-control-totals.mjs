@@ -29,8 +29,12 @@ test('Admin UI displays the period-close blockers and does not expose execution'
 });
 test('control report does not introduce settlement or provider mutations', () => {
   const start = finance.indexOf('financeRouter.get("/reconciliation/control-totals"');
-  const end = finance.indexOf('// Compare immutable historical settlement snapshots', start);
+  assert.notEqual(start, -1, 'control-totals route must exist');
+  const nextRoute = finance.indexOf('\nfinanceRouter.', start + 1);
+  const end = nextRoute === -1 ? finance.length : nextRoute;
   const route = finance.slice(start, end);
-  assert.doesNotMatch(route, /\.update\(|\.insert\((refundRequests|payoutRequests|settlements|providerOperationOutbox)/);
+  assert.doesNotMatch(route, /\.update\s*\(/);
+  assert.doesNotMatch(route, /\.insert\s*\((refundRequests|payoutRequests|settlements|providerOperationOutbox)\b/);
+  assert.doesNotMatch(route, /\b(?:INSERT\s+INTO|UPDATE|DELETE\s+FROM)\s+(?:refund_requests|payout_requests|settlements|provider_operation_outbox)\b/i);
   assert.match(route, /readOnly: true/);
 });

@@ -22,7 +22,7 @@
     "preview:demo": "vite preview --host 0.0.0.0",
     "verify:source": "node scripts/verify-source.mjs",
     "verify:traceability": "node scripts/verify-traceability.mjs",
-    "verify:all": "npm run verify:source && npm run verify:traceability && npm run verify:migrations && npm run verify:evidence && npm run verify:admin-overview && npm run verify:admin-audit && npm run verify:admin-queues && npm run verify:admin-access && npm run verify:admin-bulk && npm run verify:admin-step-up && npm run verify:admin-roles && npm run verify:admin-maker-checker && npm run verify:admin-bootstrap && npm run verify:admin-role-management && npm run verify:admin-high-risk && npm run verify:transactional-step-up && npm run verify:provider-outbox && npm run verify:batch38-recovery && npm run verify:batch39-auth && npm run verify:batch40 && npm run verify:batch41 && npm run verify:batch43 && npm run verify:batch44 && npm run verify:batch45 && npm run verify:batch46 && npm run verify:batch47 && npm run verify:batch48 && npm run verify:batch49 && npm run verify:batch50 && npm run test:admin-step-up && npm run test:admin-role-policy && npm run test:admin-maker-checker && npm run test:admin-bootstrap && npm run test:admin-role-management && npm run test:admin-access && npm run test:audit-query && npm run test:admin-queues && npm run test:batch43 && npm run test:batch44 && npm run test:batch45 && npm run test:batch46 && npm run test:batch47 && npm run test:batch48 && npm run test:batch49 && npm run test:batch50 && npm run verify:batch51 && npm run test:batch51",
+    "verify:all": "npm run verify:source && npm run verify:traceability && npm run verify:migrations && npm run verify:evidence && npm run verify:admin-overview && npm run verify:admin-audit && npm run verify:admin-queues && npm run verify:admin-access && npm run verify:admin-bulk && npm run verify:admin-step-up && npm run verify:admin-roles && npm run verify:admin-maker-checker && npm run verify:admin-bootstrap && npm run verify:admin-role-management && npm run verify:admin-high-risk && npm run verify:transactional-step-up && npm run verify:provider-outbox && npm run verify:batch38-recovery && npm run verify:batch39-auth && npm run verify:batch40 && npm run verify:batch41 && npm run verify:batch43 && npm run verify:batch44 && npm run verify:batch45 && npm run verify:batch46 && npm run verify:batch47 && npm run verify:batch48 && npm run verify:batch49 && npm run verify:batch50 && npm run test:admin-step-up && npm run test:admin-role-policy && npm run test:admin-maker-checker && npm run test:admin-bootstrap && npm run test:admin-role-management && npm run test:admin-access && npm run test:audit-query && npm run test:admin-queues && npm run test:batch43 && npm run test:batch44 && npm run test:batch45 && npm run test:batch46 && npm run test:batch47 && npm run test:batch48 && npm run test:batch49 && npm run test:batch50 && npm run verify:batch51 && npm run test:batch51 && npm run test:drizzle-v1-conversion",
     "verify:migrations": "node scripts/verify-migrations.mjs",
     "release:check": "node scripts/check-release-gates.mjs",
     "verify:evidence": "node scripts/verify-evidence-matrix.mjs",
@@ -75,7 +75,10 @@
     "verify:batch57": "node scripts/verify-batch57-acceptance-readiness.mjs",
     "test:admin-governance-postgres": "node --test scripts/integration/test-admin-governance-postgres.mjs",
     "test:postgres-governance": "node --test scripts/integration/test-admin-governance-postgres.mjs scripts/integration/test-outbox-postgres.mjs",
-    "verify:governance": "node scripts/verify-governance-registers.mjs"
+    "verify:governance": "node scripts/verify-governance-registers.mjs",
+    "test:drizzle-v1-conversion": "node --test scripts/test-drizzle-v1-conversion.mjs",
+    "db:migration-v1:capture": "node scripts/drizzle-v1-conversion.mjs capture",
+    "db:migration-v1:verify": "node scripts/drizzle-v1-conversion.mjs verify"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
@@ -94,7 +97,7 @@
     "@aws-sdk/client-s3": "^3.922.0",
     "file-type": "^21.0.0",
     "multer": "^2.0.2",
-    "sharp": "^0.34.5"
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
