@@ -23,3 +23,7 @@ The CI run `44594034735` stopped at requirement traceability. The traceability r
 The register repair is not application acceptance. Candidate test files identify where tests may be developed or run; they do not prove that a requirement is covered. PostgreSQL migration/API/concurrency, browser, security, independent acceptance and release checks remain outstanding unless a later run records explicit evidence.
 
 Run the normal CI workflow on this branch. A passing static register check must not be interpreted as permission to apply migrations, move money, enable provider operations or release the product.
+
+## Follow-on CI finding
+
+The first full CI attempt passed the repaired traceability and evidence-matrix checks, then exposed a stale Batch 49 test boundary. The test used a comment marker that no longer followed the control-totals route, so its source slice extended into unrelated mutating Finance routes. The test now delimits the control-totals route at the next Finance route registration and continues to reject updates or writes to settlement, refund, payout and provider-operation records. This corrects the test boundary; it does not relax the read-only requirement.
