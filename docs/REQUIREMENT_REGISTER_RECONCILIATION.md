@@ -27,3 +27,21 @@ Run the normal CI workflow on this branch. A passing static register check must 
 ## Follow-on CI finding
 
 The first full CI attempt passed the repaired traceability and evidence-matrix checks, then exposed a stale Batch 49 test boundary. The test used a comment marker that no longer followed the control-totals route, so its source slice extended into unrelated mutating Finance routes. The test now delimits the control-totals route at the next Finance route registration and continues to reject updates or writes to settlement, refund, payout and provider-operation records. This corrects the test boundary; it does not relax the read-only requirement.
+
+## Full CI result — 19 November 2026
+
+Latest full workflow run: [44595627238](https://github.com/Kennedy-Onyango-coder/return4me_final/actions/runs/44595627238), commit `fe7c99e5287499136664c2fe3b6e3b7711fa994b`.
+
+| Check | Result |
+|---|---|
+| `npm ci` | PASS |
+| `npm run verify:all` | PASS |
+| `npm run typecheck` | PASS |
+| `npm run db:migrate` | PASS against the workflow's disposable PostgreSQL 16 service |
+| `npm test -- --run` | PASS |
+| `npm run build` | PASS |
+| `npm audit --audit-level=high` | FAIL — 5 advisories reported (4 moderate, 1 high) |
+
+The remaining high-severity finding is in `sharp@0.34.5`; GitHub Advisory Database identifies `sharp` versions below 0.35.5 as affected by the librsvg advisory and lists 0.35.5 as patched: https://github.com/advisories/GHSA-wq5f-xc86-pv6w. The audit also reports the deprecated `drizzle-kit@0.31.11` → `@esbuild-kit/esm-loader` → `@esbuild-kit/core-utils` → `esbuild@0.18.20` chain for a moderate advisory: https://github.com/advisories/GHSA-67mh-4wv8-2f99.
+
+No `npm audit fix --force` was run. The CI output proposes a breaking Drizzle Kit downgrade to 0.18.1, so the remaining dependency remediation requires a separately reviewed lockfile update and verification of Drizzle configuration/migration behavior. The audit gate remains enabled and release remains `NOT_AUTHORISED`.
