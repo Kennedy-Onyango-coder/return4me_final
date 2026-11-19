@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+const finance=readFileSync(new URL('../server/routes/finance.ts',import.meta.url),'utf8');
+const ui=readFileSync(new URL('../src/App.tsx',import.meta.url),'utf8');
+const queue=(start,end)=>finance.split(start)[1]?.split(end)[0]??'';
+test('payment queue excludes payer and provider identifiers',()=>{const q=queue('financeRouter.get("/payment-transactions"','financeRouter.get("/payment-transactions/:id"');assert.ok(q);assert.doesNotMatch(q,/payerPhone|providerReference|providerReceipt/);});
+test('settlement queue excludes allocation and beneficiary detail',()=>{const q=queue('financeRouter.get("/settlements"','financeRouter.get("/settlements/:id"');assert.ok(q);assert.doesNotMatch(q,/finderUserId|agentUserId|finderKes|agentKes|platformKes/);});
+test('refund queue excludes rationale and provider evidence',()=>{const q=queue('financeRouter.get("/refund-requests"','financeRouter.get("/refund-requests/:id"');assert.ok(q);assert.doesNotMatch(q,/reason:|providerBatchId|reconciliationNote|destinationFingerprint/);});
+test('payout queue excludes beneficiary and destination metadata',()=>{const q=queue('financeRouter.get("/payout-requests"','financeRouter.get("/payout-requests/:id"');assert.ok(q);assert.doesNotMatch(q,/beneficiaryUserId|destinationFingerprint|providerTransactionId/);});
+test('reconciliation queue excludes provider references and reviewer notes',()=>{const q=queue('financeRouter.get("/reconciliation/collections"','financeRouter.get("/reconciliation/collections/:id"');assert.ok(q);assert.doesNotMatch(q,/externalReference|resolutionNote|evidenceRef|reviewedBy/);});
+test('sensitive detail endpoints audit access and never return phone ciphertext',()=>{for(const a of ['finance.payment_detail_viewed','finance.settlement_detail_viewed','finance.refund_detail_viewed','finance.payout_detail_viewed','finance.reconciliation_detail_viewed','finance.reward_authorization_detail_viewed','finance.payout_destination_detail_viewed'])assert.ok(finance.includes(a));assert.doesNotMatch(finance,/payout-destinations\/:id\/admin-detail[\s\S]*?phoneCiphertext:/);});
+test('Finance UI requires explicit detail selection and has a restricted detail surface',()=>{assert.match(ui,/openFinanceDetail\("payment"/);assert.match(ui,/openFinanceDetail\("refund"/);assert.match(ui,/openFinanceDetail\("payoutRequest"/);assert.match(ui,/Restricted financial detail/);});
+test('detail access is read-only and does not create an execution action',()=>{assert.match(finance,/financeRouter\.get\("\/payout-requests\/:id"/);assert.match(finance,/financeRouter\.post\("\/payout-requests\/:id\/execute"/);assert.match(finance,/Payout initiation is disabled/);});

@@ -1,0 +1,17 @@
+import { readFile } from "node:fs/promises";
+import assert from "node:assert/strict";
+const route = await readFile(new URL("../server/routes/support.ts", import.meta.url), "utf8");
+assert.match(route, /supportRouter\.get\("\/queue", requireRole\("support", "admin"\)/);
+assert.match(route, /supportRouter\.patch\("\/tickets\/:ticketId\/assignment", requireRole\("support", "admin"\)/);
+assert.match(route, /parseSupportQueueQuery\(req\.query as Record<string, unknown>\)/);
+assert.match(route, /parseSupportAssignment\(req\.body\)/);
+assert.match(route, /assignedTo: supportTickets\.assignedTo/);
+assert.doesNotMatch(route.match(/supportRouter\.get\("\/queue"[\s\S]*?\n\}\);/)?.[0] ?? "", /requesterId|description|phone|email/);
+assert.match(route, /\.for\("update"\)/);
+assert.match(route, /inArray\(userRoles\.role, \["admin", "owner"\]\)/);
+assert.match(route, /isNull\(userRoles\.revokedAt\)/);
+assert.match(route, /eq\(users\.isSuspended, false\)/);
+assert.match(route, /isNotNull\(users\.emailVerifiedAt\)/);
+assert.match(route, /await tx\.insert\(auditEvents\)/);
+assert.match(route, /before: \{ assignedTo: ticket\.assignedTo \}, after: \{ assignedTo: updated\.assignedTo \}, reason:/);
+console.log("Support queue ownership static guard passed: role gate, bounded query parser, minimal DTO, active verified Admin or Owner assignee, row lock and transaction-coupled audit are present. Static guard only.");

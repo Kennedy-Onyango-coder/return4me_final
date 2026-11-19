@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: return4me-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: return4me
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-dev-only-change-me}
+    ports:
+      - "5432:5432"
+    volumes:
+      - return4me_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d return4me"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+volumes:
+  return4me_pgdata:

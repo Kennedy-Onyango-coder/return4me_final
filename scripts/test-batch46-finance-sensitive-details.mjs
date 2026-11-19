@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+const finance=readFileSync(new URL('../server/routes/finance.ts',import.meta.url),'utf8');
+const ui=readFileSync(new URL('../src/App.tsx',import.meta.url),'utf8');
+const section=(start,end)=>finance.split(start)[1]?.split(end)[0]??'';
+test('ledger queue does not expose memo, source ID or posting legs',()=>{const q=section('financeRouter.get("/ledger/journals",','financeRouter.get("/ledger/reconciliation-overview"');assert.ok(q);assert.doesNotMatch(q,/\bsourceId\b|\bidempotencyKey\b|memo:|financialPostings/);});
+test('ledger detail is Admin/Owner-only and records access',()=>{assert.match(finance,/financeRouter\.get\("\/ledger\/journals\/:id",\s*requireRole\("admin",\s*"owner"\)/);assert.match(finance,/finance\.ledger_journal_detail_viewed/);});
+test('provider attention queue excludes resource and provider identifiers',()=>{const q=section('financeRouter.get("/provider-operations/attention"','financeRouter.get("/provider-operations/:id"');assert.ok(q);assert.doesNotMatch(q,/resourceId|providerReference|idempotencyKey/);});
+test('provider operation detail is audited and read-only',()=>{assert.match(finance,/financeRouter\.get\("\/provider-operations\/:id",\s*requireRole\("admin",\s*"owner"\)/);assert.match(finance,/finance\.provider_operation_detail_viewed/);assert.match(finance,/requestPayloadExposed: false/);});
+test('Finance UI provides explicit journal and provider-operation detail selection',()=>{assert.match(ui,/openFinanceDetail\("journal"/);assert.match(ui,/openFinanceDetail\("operation"/);});
+test('provider recovery workspace offers no retry or dispatch action',()=>{assert.match(ui,/No retry or dispatch action is available here\./);assert.match(finance,/automaticRetry: false/);});

@@ -1,0 +1,51 @@
+name: Return4me CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: return4me_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d return4me_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgres://postgres:ci-only-password@localhost:5432/return4me_test
+      SESSION_HASH_SECRET: ci-session-hash-secret-000000000000000000000000000000
+      OTP_HASH_SECRET: ci-otp-hash-secret-000000000000000000000000000000
+      CASE_TOKEN_HASH_SECRET: ci-case-token-hash-secret-000000000000000000000000000000
+      PAYMENT_PII_ACTIVE_KEY_VERSION: v1
+      PAYMENT_PII_ENCRYPTION_KEY_V1: 1111111111111111111111111111111111111111111111111111111111111111
+      PAYMENT_PII_FINGERPRINT_KEY: 2222222222222222222222222222222222222222222222222222222222222222
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run verify:all
+      - run: npm run typecheck
+      - run: npm run db:migrate
+      - run: npm test -- --run
+      - run: npm run build
+      - run: npm audit --audit-level=high

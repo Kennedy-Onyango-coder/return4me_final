@@ -1,0 +1,111 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1794484746551,
+      "tag": "0000_acoustic_naoko",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794556005000,
+      "tag": "0001_batch5_agent_custody",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794632640000,
+      "tag": "0002_custody_chain_v2",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794632700000,
+      "tag": "0003_financial_journal",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794652800000,
+      "tag": "0004_intasend_claimant_collection",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794656400000,
+      "tag": "0005_collection_accounting_receipts",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794660000000,
+      "tag": "0006_original_payer_refund_controls",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794663600000,
+      "tag": "0007_reward_settlement_payout_controls",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794667200000,
+      "tag": "0008_notification_outbox",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794670800000,
+      "tag": "0009_category_decision_notifications",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794674400000,
+      "tag": "0010_data_rights_requests",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794678000000,
+      "tag": "0011_audit_created_index",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794700800000,
+      "tag": "0012_admin_step_up_grants",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794704400000,
+      "tag": "0013_two_privileged_admin_roles",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794708000000,
+      "tag": "0014_admin_action_approvals",
+      "breakpoints": true
+    }
+  ]
+}

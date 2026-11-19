@@ -1,0 +1,1 @@
+Batch 50 adds read-only, Admin/Owner-only finance evidence candidate matching for collection reconciliation and refund/payout evidence completeness indicators. It does not mutate reconciliation state or initiate provider operations. See docs/BATCH50_FINANCE_EVIDENCE_MATCHING.md.

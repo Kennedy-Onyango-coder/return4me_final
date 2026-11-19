@@ -1,0 +1,2 @@
+exception_id,scope,requirement_ids,risk,requested_by,requested_at_utc,business_justification,compensating_controls,expiry_at_utc,independent_reviewer,owner_decision,decision_reference,status
+NO-OPEN-EXCEPTIONS-001,All stages,ALL,No waiver has been approved.,,,No exception request is recorded.,No exception; all release gates remain mandatory.,,,NOT_GRANTED,,NO_ACTIVE_EXCEPTIONS

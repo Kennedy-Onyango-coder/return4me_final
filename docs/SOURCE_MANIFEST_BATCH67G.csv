@@ -1,0 +1,12 @@
+path,sha256,bytes,change_scope
+server/routes/agents.ts,71b91ed25873fe9ef6665b3863655b64d9ebfab32a93084856c02e71733dfd7f,43106,"Batch 67G final release, claimant confirmation and legal-hold serialization"
+server/routes/agent-operations.ts,cdf5699c5b7eac7961d6a07909f581137381f1f2c9b52a5f8572e765433ccdff,41311,"Batch 67G final release, claimant confirmation and legal-hold serialization"
+server/routes/security-governance.ts,48f478ec0b0eb26986fc98cc1738be44a64b77cdb4c41ae7c1566fc643afc687,14311,"Batch 67G final release, claimant confirmation and legal-hold serialization"
+docs/BATCH67G_FINAL_RELEASE_AND_HOLD_SERIALIZATION.md,4f5c7b0294f97d26bbfeaf2c1b50b4f9c03747c669ce9ca4589be0b656be4ba0,4731,"Batch 67G final release, claimant confirmation and legal-hold serialization"
+docs/ROADMAP_1_TO_67_UPDATED.md,871f1171257c72e8295f085a377b3b241c9477782bcb58532f2907c0ee4f2dca,8743,"Batch 67G final release, claimant confirmation and legal-hold serialization"
+docs/IMPLEMENTATION_PROGRESS_2026-11-18.md,d15872ab6b9c8615419ecaa1678b12b81d3c725ebc86c82699579fe1051074a5,5422,"Batch 67G final release, claimant confirmation and legal-hold serialization"
+docs/IMPLEMENTATION_REGISTER.md,9dbc17affd8997993137acccd5f603f58945061341eb4cdb8c90b11c9e5eedaa,38324,"Batch 67G final release, claimant confirmation and legal-hold serialization"
+docs/REQUIREMENT_TRACEABILITY.csv,e2f993187e589d2e0b26e2936536748544aaa7ba19a4710a44dabfb3dfd08c25,110090,"Batch 67G final release, claimant confirmation and legal-hold serialization"
+docs/REQUIREMENT_EVIDENCE_MATRIX.csv,d2eb7574d4ae4408d0b5cf9c7f0f1a1496f1ab71ce0c479a92dbbab5e47be4c4,9837,"Batch 67G final release, claimant confirmation and legal-hold serialization"
+docs/CROSS_STAGE_INTEGRATION_SEAM_REGISTER.csv,714cdb3be66e268aebe55aa63510eeb27c312bc9a1c1eeda261e1985acd63c9e,9675,"Batch 67G final release, claimant confirmation and legal-hold serialization"
+README_BATCH67G.txt,08339bf9edc6b38baa2344fda3ea1256cd34fdf58e1c8ceb5f80cebd09d47c70,1087,"Batch 67G final release, claimant confirmation and legal-hold serialization"

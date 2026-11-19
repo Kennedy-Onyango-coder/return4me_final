@@ -1,0 +1,18 @@
+import { readFileSync } from 'node:fs';
+import assert from 'node:assert/strict';
+const finance = readFileSync('server/routes/finance.ts', 'utf8');
+const admin = readFileSync('server/routes/admin.ts', 'utf8');
+const app = readFileSync('src/App.tsx', 'utf8');
+assert.match(finance, /provider-operations\/attention[\s\S]*staleAfterMinutes/);
+assert.match(finance, /ageMinutes:[\s\S]*stale:/);
+assert.match(finance, /automaticRetry: false/);
+assert.match(finance, /ledger\/journals[\s\S]*sourceType: z\.string/);
+assert.match(finance, /baseQuery\.where\(where\)\.orderBy\(desc\(financialJournals\.createdAt\)\)\.limit\(filters\.limit\)\.offset\(filters\.offset\)/);
+assert.match(admin, /action-approvals\/history/);
+assert.match(admin, /admin\.action_approval_history_viewed/);
+assert.match(admin, /payloadExposed: false/);
+assert.match(admin, /reviewedBy: adminActionApprovals\.reviewedBy/);
+assert.match(app, /Recent approval history/);
+assert.match(app, /Needs attention/);
+assert.doesNotMatch(finance, /automaticRetry:\s*true/);
+console.log('Batch 47 Finance oversight source guard: 12/12 passed');

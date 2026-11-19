@@ -1,0 +1,8 @@
+decision_id,requirement_id_or_scope,decision,evidence_ids,reviewer_name,reviewer_role,reviewed_source_sha256,reviewed_at_utc,findings,remediation_reference,supersedes_decision_id
+ACC-STAGE12-001,Stage 12 Finance,PENDING,EV-B59-001,,Independent Finance/Accounting reviewer,,,No independent acceptance recorded.,,
+ACC-STAGE13-001,Stage 13 Communications,PENDING,EV-B60-001,,Independent Security/Communications reviewer,,,No independent acceptance recorded.,,
+ACC-STAGE14-001,Stage 14 Security and Privacy,PENDING,EV-B61-001,,Independent Security/Privacy reviewer,,,No independent acceptance recorded.,,
+ACC-STAGE15-001,Stage 15 UX and Accessibility,PENDING,EV-B62-001,,Independent Accessibility/UX reviewer,,,No independent acceptance recorded.,,
+ACC-STAGE16-001,Stage 16 Technical Architecture,PENDING,EV-B63-001,,Independent Architecture/Operations reviewer,,,No independent acceptance recorded.,,
+ACC-STAGE17-001,Stage 17 Governance and Evidence,PENDING,EV-B64-001,,Independent Governance/QA reviewer,,,No independent acceptance recorded.,,
+ACC-STAGES1-10-B65-001,PROD-003; AGENT-003; Batch 65 Stage 1–10 additions,PENDING,EV-B65-001,,Independent QA / Security / Product reviewer,,,Source additions only. Runtime/API/database/UI/security verification and independent acceptance not performed.,,

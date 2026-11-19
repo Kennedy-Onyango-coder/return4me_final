@@ -1,0 +1,15 @@
+import { readFile } from "node:fs/promises";
+import assert from "node:assert/strict";
+const route = await readFile(new URL("../server/routes/admin.ts", import.meta.url), "utf8");
+const ui = await readFile(new URL("../src/App.tsx", import.meta.url), "utf8");
+const policy = await readFile(new URL("../shared/admin-access-policy.mjs", import.meta.url), "utf8");
+assert.match(route, /adminRouter\.get\("\/capabilities",\s*requireRole\(/);
+assert.match(route, /getAdminCapabilityMatrix\(req\.auth!\.roles\)/);
+assert.match(ui, /function AdminCapabilityMatrix\(\)/);
+assert.match(ui, /api<\{capabilities:Capability\[\];enforcement:string\}>\("\/admin\/capabilities"\)/);
+assert.match(policy, /roles: \["owner"\]/);
+assert.match(policy, /active.has\("owner"\)/);
+assert.match(policy, /claims\.detail\.review/);
+assert.match(policy, /finance\.operations/);
+assert.match(policy, /admin\.roles\.manage/);
+console.log("Admin access-policy static guard passed. Route-level middleware remains authoritative; static guard only.");

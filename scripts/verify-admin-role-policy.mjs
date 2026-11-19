@@ -1,0 +1,17 @@
+import { readFile } from "node:fs/promises";
+import assert from "node:assert/strict";
+const security = await readFile(new URL("../server/security.ts", import.meta.url), "utf8");
+const policy = await readFile(new URL("../shared/admin-role-policy.mjs", import.meta.url), "utf8");
+const schema = await readFile(new URL("../server/db/schema.ts", import.meta.url), "utf8");
+const contracts = await readFile(new URL("../shared/contracts.ts", import.meta.url), "utf8");
+const migration = await readFile(new URL("../server/db/migrations/0013_two_privileged_admin_roles.sql", import.meta.url), "utf8");
+assert.match(security, /normalizePrivilegedRoles/);
+assert.match(security, /hasRoleAuthority\(req\.auth\.roles, allowed\)/);
+assert.match(policy, /legacyAdminScopes/);
+assert.match(policy, /roles\.includes\("owner"\)/);
+assert.match(policy, /normalizePrivilegedRoles\(allowedRoles\)/);
+assert.match(contracts, /"admin" \| "owner"/);
+assert.match(migration, /UPDATE user_roles[\s\S]*revoked_at = now\(\)/);
+assert.match(migration, /'admin'::user_role/);
+assert.match(migration, /A person holds either Admin or Super Admin/);
+console.log("Two privileged admin-role static guard passed; database migration remains unapplied.");
