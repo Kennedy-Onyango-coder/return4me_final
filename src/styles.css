@@ -284,3 +284,95 @@ html[data-theme="dark"] .invitation-list article { border-color: #456451; }
 html[data-theme="dark"] .notice-panel { background: #3c2b19; border-color: #98612c; color: #ffe6cf; }
 html[data-theme="dark"] .feedback-error { background: #3b1820; color: #fecaca; border-color: #7f1d1d; }
 html[data-theme="dark"] .feedback-success { background: #12382a; color: #b9ddc4; border-color: #246d45; }
+
+/* B3 — photographic homepage hero, layered for dependable text contrast. */
+.hero-wrap {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #092719;
+}
+.hero-wrap::before,
+.hero-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.hero-wrap::before {
+  z-index: -2;
+  background-image: url("/brand/return4me-hero-found-id-nairobi.webp");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center 46%;
+  transform: scale(1.035);
+  animation: r4m-hero-drift 32s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.hero-wrap::after {
+  z-index: -1;
+  background:
+    linear-gradient(90deg,
+      rgba(5, 27, 17, .96) 0%,
+      rgba(7, 37, 23, .91) 38%,
+      rgba(9, 39, 25, .72) 68%,
+      rgba(9, 39, 25, .56) 100%),
+    linear-gradient(180deg, rgba(9, 39, 25, .16), rgba(9, 39, 25, .42));
+}
+.hero-wrap > div {
+  position: relative;
+  z-index: 1;
+}
+.hero-wrap .eyebrow {
+  color: #ffd0a6;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, .32);
+}
+.hero-wrap h1 {
+  color: #fffefa;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, .28);
+}
+.hero-wrap p {
+  color: #f2f1e9;
+}
+.hero-wrap .text-blue-200,
+.hero-wrap .text-teal-200 {
+  color: #ffd0a6;
+  text-decoration-color: rgba(255, 180, 119, .8);
+}
+.hero-wrap .text-blue-200:hover,
+.hero-wrap .text-teal-200:hover {
+  color: #fffefa;
+}
+.hero-wrap .btn-outline {
+  border-color: rgba(255, 208, 166, .92);
+  color: #fffefa;
+  background: rgba(9, 39, 25, .32);
+  backdrop-filter: blur(8px);
+}
+.hero-wrap .btn-outline:hover {
+  border-color: #ff9447;
+  background: #f47721;
+  color: #092719;
+}
+@keyframes r4m-hero-drift {
+  from { transform: scale(1.035) translate3d(0, 0, 0); }
+  to { transform: scale(1.10) translate3d(-.6%, -.35%, 0); }
+}
+@media (max-width: 767px) {
+  .hero-wrap::before {
+    background-position: 58% center;
+    animation-duration: 42s;
+  }
+  .hero-wrap::after {
+    background:
+      linear-gradient(90deg, rgba(5, 27, 17, .91), rgba(7, 37, 23, .79)),
+      linear-gradient(180deg, rgba(9, 39, 25, .12), rgba(9, 39, 25, .48));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-wrap::before {
+    animation: none;
+    transform: none;
+    will-change: auto;
+  }
+}
