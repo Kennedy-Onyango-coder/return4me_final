@@ -1,4 +1,4 @@
-# Return4me master roadmap — updated through Batch 67J
+# Return4me master roadmap — updated through Batch 67K
 
 **Date:** 21 November 2026  
 **Source baseline:** Cumulative Batches 59–67C archive, with Batch 67D, 67E, 67F, 67G, 67H, 67I and 67J source additions recorded in this package.  
@@ -32,8 +32,9 @@
 | 67G | Serialize claimant confirmation, final Agent release and claim/report/assignment legal holds using a shared lock order; bind completion notification to the exact completed claim | Source added; PostgreSQL/API/concurrency/hold-race acceptance pending |
 | 67H | Serialize appointment request/confirm/decline against claim, assignment and hold changes; make appointment audits atomic; correct current-assignment workspace indicators | Source added; PostgreSQL/API/concurrency/appointment-race acceptance pending |
 | 67I | Serialize collection-code issuance with report/claim/assignment/appointment state; require current confirmed appointment, paid claim, current identity check and no active dispute/legal hold; expire code no later than appointment end | Source added; PostgreSQL/API/concurrency and delivery acceptance pending |
-| 67J | Appointment expiry, cancellation/rescheduling, collection-authorisation invalidation, manual no-show and claimant-visible outcomes | Source added; GitHub CI passed on 21 November 2026; local/API/PostgreSQL/concurrency/browser and independent acceptance pending |
-| 67K onward | Remaining source implementation gaps | Pending |
+| 67J | Appointment expiry, cancellation/rescheduling, collection-authorisation invalidation, manual no-show and claimant-visible outcomes | Source added; GitHub CI and user-reported local verification passed; dedicated API/PostgreSQL/concurrency/browser and independent acceptance pending |
+| 67K | Transactional claimant assessment confirmation; serialize against report/claim/assignment changes; commit audit atomically | Source added; CI and local verification pending |
+| 67L onward | Remaining source implementation gaps from the cumulative inventory | Pending |
 | 68 | Final cross-stage integration review and implementation freeze after source gaps close | Pending |
 | 69 | Consolidated tests, controlled database replay, security/accessibility/performance verification and independent acceptance | Deferred until Batch 68 and explicit user authorization |
 
@@ -100,3 +101,10 @@ Claimants and the currently assigned active verified Agent may cancel a requeste
 The new manual no-show endpoint requires the current approved claim, active verified Agent assignment, exact appointment/claim/assignment binding, confirmed status and ends_at <= now(). It has no automatic timer, no grace period and no claimant/Admin no-show path. Claimant and Agent workspaces now expose appointment outcomes and the permitted actions.
 
 No migration was added. The existing appointment status vocabulary is retained. Source-level tests and a dedicated source verifier were added. GitHub Actions run 44818456352 passed on commit 0030ebd5a447952dd54162e2bd64e190aa3b14ed: verify:all (including verify:batch67j), typecheck, disposable CI migration, 35 test files / 168 tests, build and npm audit --audit-level=high. The build retains the existing large-chunk warning and audit reports moderate findings only. Local verification, dedicated appointment API/PostgreSQL concurrency/browser testing and independent acceptance remain pending. All independent acceptance decisions remain pending and production release remains not authorised.
+
+
+## Batch 67K implementation details
+
+The claimant assessment-confirmation route in `server/routes/finance.ts` now performs the consent-state transition and its audit insert in one database transaction. It follows the report -> claim -> active assignment -> assessment row-lock order, rechecks that the signed-in user is the claimant and that the claim remains approved, and uses an inspection event associated with the current active assignment when calculating the existing payment-window expiry. The endpoint still records consent only; it does not initiate or request a payment. No schema change or migration was added. A focused source-contract test covers transaction coupling, lock order and in-transaction ownership/status checks in `server/tests/batch67k-assessment-confirmation.test.ts`.
+
+CI and local verification for Batch 67K are pending. PostgreSQL/API concurrency proof, claimant browser journey and independent financial acceptance remain pending. INT-009 remains NOT_VERIFIED until the complete payment/ledger/provider integration evidence is accepted. No provider call, money movement, production migration or deployment was performed.
