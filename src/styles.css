@@ -376,3 +376,41 @@ html[data-theme="dark"] .feedback-success { background: #12382a; color: #b9ddc4;
     will-change: auto;
   }
 }
+
+/* B4 — unify interactive controls and the homepage process panel with the brand. */
+:root {
+  accent-color: var(--r4m-blue);
+}
+::selection {
+  color: #092719;
+  background: #ffd0a6;
+}
+.hero-wrap .rounded-3xl {
+  border-color: rgba(255, 208, 166, .24);
+  background: linear-gradient(145deg, rgba(255, 255, 255, .105), rgba(9, 39, 25, .34));
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .22);
+}
+.hero-wrap .rounded-3xl > div:first-child > span:first-child {
+  color: #fffefa;
+}
+.hero-wrap .rounded-3xl > div:first-child > span:last-child {
+  border: 1px solid rgba(255, 180, 119, .22);
+  background: rgba(244, 119, 33, .14);
+  color: #ffd0a6;
+}
+.hero-wrap .rounded-3xl .rounded-full {
+  background: rgba(244, 119, 33, .20);
+  color: #ffd0a6;
+}
+.hero-wrap .rounded-3xl .border-b {
+  border-color: rgba(255, 255, 255, .14);
+}
+input[type="checkbox"],
+input[type="radio"],
+progress {
+  accent-color: var(--r4m-blue);
+}
+html[data-theme="dark"] ::selection {
+  color: #092719;
+  background: #ffb477;
+}
