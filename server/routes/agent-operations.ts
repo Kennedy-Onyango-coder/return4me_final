@@ -252,18 +252,33 @@ agentOperationsRouter.post("/availability/windows", requireRole("agent"), async 
   try { const r = await pool.query(`INSERT INTO agent_availability_windows(agent_id,starts_at,ends_at) SELECT id,$2,$3 FROM agents WHERE user_id=$1 AND status='active' RETURNING id,starts_at,ends_at,timezone,published_at`, [req.auth!.id,parsed.data.startsAt,parsed.data.endsAt]); if (!r.rowCount) return res.status(403).json({ error: "An active Agent account is required" }); await pool.query("INSERT INTO audit_events(actor_id,action,resource_type,resource_id,outcome) VALUES($1,'agent.availability_window_published','agent_availability_window',$2,'success')", [req.auth!.id,r.rows[0].id]); res.status(201).json({ window:r.rows[0] }); } catch(e) { next(e); }
 });
 agentOperationsRouter.get("/availability/windows/mine", requireRole("agent"), async (req,res,next)=>{try{const r=await pool.query("SELECT w.* FROM agent_availability_windows w JOIN agents a ON a.id=w.agent_id WHERE a.user_id=$1 AND w.ends_at>now() ORDER BY w.starts_at",[req.auth!.id]);res.json({windows:r.rows,timezone:"Africa/Nairobi"});}catch(e){next(e);}});
-agentOperationsRouter.get("/appointments/mine", requireRole("agent"), async (req, res, next) => { try { const r = await pool.query(`SELECT p.*,r.reference FROM agent_appointments p JOIN agents a ON a.id=p.agent_id JOIN claims c ON c.id=p.claim_id JOIN reports r ON r.id=c.report_id WHERE a.user_id=$1 ORDER BY p.starts_at`, [req.auth!.id]); res.json({ appointments: r.rows, timezone: "Africa/Nairobi" }); } catch (e) { next(e); } });
+agentOperationsRouter.get("/appointments/mine", requireRole("agent"), async (req, res, next) => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query("WITH expired AS (UPDATE agent_appointments p SET status='cancelled',updated_at=now() FROM agents a WHERE a.id=p.agent_id AND a.user_id=$1 AND p.status='requested' AND p.ends_at<=now() RETURNING p.id) INSERT INTO audit_events(actor_id,action,resource_type,resource_id,outcome,metadata) SELECT $1,'claim.collection_appointment_request_expired','appointment',id,'success','{\"reason\":\"request_window_elapsed\",\"resultingStatus\":\"cancelled\"}'::jsonb FROM expired", [req.auth!.id]);
+    const r = await client.query("SELECT p.*,r.reference FROM agent_appointments p JOIN agents a ON a.id=p.agent_id JOIN claims c ON c.id=p.claim_id JOIN reports r ON r.id=c.report_id WHERE a.user_id=$1 ORDER BY p.starts_at", [req.auth!.id]);
+    await client.query("COMMIT");
+    res.json({ appointments: r.rows, timezone: "Africa/Nairobi" });
+  } catch (e) { await client.query("ROLLBACK"); next(e); } finally { client.release(); }
+});
 agentOperationsRouter.get("/claimant/assignments", requireRole("claimant"), async (req, res, next) => {
-  try { const r = await pool.query(`SELECT x.id assignment_id,c.id claim_id,r.reference, a.business_name agent_name,a.county,
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query("WITH expired AS (UPDATE agent_appointments SET status='cancelled',updated_at=now() WHERE claimant_id=$1 AND status='requested' AND ends_at<=now() RETURNING id) INSERT INTO audit_events(actor_id,action,resource_type,resource_id,outcome,metadata) SELECT $1,'claim.collection_appointment_request_expired','appointment',id,'success','{\"reason\":\"request_window_elapsed\",\"resultingStatus\":\"cancelled\"}'::jsonb FROM expired", [req.auth!.id]);
+    const r = await client.query(`SELECT x.id assignment_id,c.id claim_id,r.reference, a.business_name agent_name,a.county,
       EXISTS(SELECT 1 FROM custody_events ce WHERE ce.report_id=c.report_id AND ce.agent_id=x.agent_id AND ce.event_type='handover_ready'
         AND ce.sequence_no>COALESCE((SELECT max(ct.sequence_no) FROM custody_events ct WHERE ct.report_id=c.report_id AND ct.event_type='custody_transfer'),0)) AS handover_ready,
       EXISTS(SELECT 1 FROM custody_handover_confirmations hc WHERE hc.claim_id=c.id AND hc.assignment_id=x.id AND hc.claimant_id=c.claimant_id AND hc.agent_id=x.agent_id) AS claimant_confirmed,
+      (SELECT ap.id FROM agent_appointments ap WHERE ap.claim_id=c.id AND ap.assignment_id=x.id ORDER BY ap.created_at DESC LIMIT 1) AS appointment_id,
+      (SELECT ap.id FROM agent_appointments ap WHERE ap.claim_id=c.id AND ap.assignment_id=x.id ORDER BY ap.created_at DESC LIMIT 1) AS appointment_id,
       (SELECT ap.status FROM agent_appointments ap WHERE ap.claim_id=c.id AND ap.assignment_id=x.id ORDER BY ap.created_at DESC LIMIT 1) AS appointment_status,
       (SELECT ap.starts_at FROM agent_appointments ap WHERE ap.claim_id=c.id AND ap.assignment_id=x.id ORDER BY ap.created_at DESC LIMIT 1) AS appointment_starts_at,
       (SELECT ap.ends_at FROM agent_appointments ap WHERE ap.claim_id=c.id AND ap.assignment_id=x.id ORDER BY ap.created_at DESC LIMIT 1) AS appointment_ends_at,
       COALESCE((SELECT json_agg(json_build_object('id',w.id,'startsAt',w.starts_at,'endsAt',w.ends_at,'timezone',w.timezone) ORDER BY w.starts_at) FROM agent_availability_windows w WHERE w.agent_id=a.id AND w.ends_at>now()),'[]'::json) availability_windows
     FROM claims c JOIN reports r ON r.id=c.report_id JOIN assignments x ON x.report_id=r.id AND x.status='assigned' JOIN agents a ON a.id=x.agent_id
-    WHERE c.claimant_id=$1 AND c.status='approved' ORDER BY c.approved_at DESC`, [req.auth!.id]); res.json({ assignments: r.rows, timezone: "Africa/Nairobi" }); } catch (e) { next(e); }
+    WHERE c.claimant_id=$1 AND c.status='approved' ORDER BY c.approved_at DESC`, [req.auth!.id]); await client.query("COMMIT"); res.json({ assignments: r.rows, timezone: "Africa/Nairobi" }); } catch (e) { await client.query("ROLLBACK"); next(e); } finally { client.release(); }
 });
 agentOperationsRouter.post("/appointments/request", requireRole("claimant"), async (req, res, next) => {
   const parsed = z.object({ assignmentId: z.string().uuid(), startsAt: z.string().datetime(), endsAt: z.string().datetime() }).safeParse(req.body);
@@ -280,6 +295,9 @@ agentOperationsRouter.post("/appointments/request", requireRole("claimant"), asy
     const assignment = await client.query(`SELECT x.id,x.agent_id,a.status agent_status,a.verified_at FROM assignments x JOIN agents a ON a.id=x.agent_id
       WHERE x.id=$1 AND x.report_id=$2 AND x.status='assigned' FOR UPDATE OF x,a`, [parsed.data.assignmentId, claim.rows[0].report_id]);
     if (!assignment.rowCount || assignment.rows[0].agent_status !== "active" || !assignment.rows[0].verified_at) { await client.query("ROLLBACK"); return res.status(409).json({ error: "The assigned Agent is no longer active and verified" }); }
+    await client.query("WITH expired AS (UPDATE agent_appointments SET status='cancelled',updated_at=now() WHERE assignment_id=$1 AND claim_id=$2 AND status='requested' AND ends_at<=now() RETURNING id) INSERT INTO audit_events(actor_id,action,resource_type,resource_id,outcome,metadata) SELECT $3,'claim.collection_appointment_request_expired','appointment',id,'success','{\"reason\":\"request_window_elapsed\",\"resultingStatus\":\"cancelled\"}'::jsonb FROM expired", [assignment.rows[0].id, claim.rows[0].id, req.auth!.id]);
+    const activeAppointment = await client.query("SELECT id FROM agent_appointments WHERE assignment_id=$1 AND claim_id=$2 AND status IN ('requested','confirmed') LIMIT 1 FOR UPDATE", [assignment.rows[0].id, claim.rows[0].id]);
+    if (activeAppointment.rowCount) { await client.query("ROLLBACK"); return res.status(409).json({ error: "Cancel the current appointment before requesting a new time" }); }
     const gates = await client.query(`SELECT 1 WHERE
       EXISTS(SELECT 1 FROM agent_availability_windows w WHERE w.agent_id=$1 AND $2::timestamptz>=w.starts_at AND $3::timestamptz<=w.ends_at)
       AND NOT EXISTS(SELECT 1 FROM case_disputes d WHERE d.claim_id=$4 AND d.release_hold=true AND d.status NOT IN ('resolved','closed','dismissed'))
@@ -348,6 +366,70 @@ agentOperationsRouter.patch("/appointments/:id/decline", requireRole("agent"), a
     if (!updated.rowCount) { await client.query("ROLLBACK"); return res.status(409).json({ error: "Appointment is no longer awaiting a response" }); }
     await client.query("INSERT INTO audit_events(actor_id,action,resource_type,resource_id,outcome) VALUES($1,'claim.collection_appointment_declined','appointment',$2,'success')", [req.auth!.id, req.params.id]);
     await client.query("COMMIT"); res.json({ appointment: updated.rows[0] });
+  } catch (e) { await client.query("ROLLBACK"); next(e); } finally { client.release(); }
+});
+
+
+agentOperationsRouter.patch("/appointments/:id/cancel", requireRole("claimant", "agent"), async (req, res, next) => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const reference = await client.query("SELECT claim_id,assignment_id FROM agent_appointments WHERE id=$1", [req.params.id]);
+    if (!reference.rowCount) { await client.query("ROLLBACK"); return res.status(404).json({ error: "Appointment not found" }); }
+    const target = await client.query("SELECT report_id FROM claims WHERE id=$1", [reference.rows[0].claim_id]);
+    if (!target.rowCount) { await client.query("ROLLBACK"); return res.status(404).json({ error: "Appointment claim not found" }); }
+    await client.query("SELECT id FROM reports WHERE id=$1 FOR UPDATE", [target.rows[0].report_id]);
+    const claim = await client.query("SELECT id,report_id,claimant_id,status FROM claims WHERE id=$1 FOR UPDATE", [reference.rows[0].claim_id]);
+    const assignment = await client.query("SELECT x.id,x.agent_id,a.user_id,a.status agent_status,a.verified_at FROM assignments x JOIN agents a ON a.id=x.agent_id WHERE x.id=$1 AND x.report_id=$2 AND x.status='assigned' FOR UPDATE OF x,a", [reference.rows[0].assignment_id, target.rows[0].report_id]);
+    const appointment = await client.query("SELECT id,claim_id,assignment_id,agent_id,claimant_id,status,ends_at FROM agent_appointments WHERE id=$1 AND assignment_id=$2 FOR UPDATE", [req.params.id, reference.rows[0].assignment_id]);
+    const isClaimant = !!claim.rowCount && claim.rows[0].claimant_id === req.auth!.id;
+    const isCurrentAgent = !!assignment.rowCount && assignment.rows[0].user_id === req.auth!.id && assignment.rows[0].agent_status === "active" && !!assignment.rows[0].verified_at;
+    if (!claim.rowCount || claim.rows[0].status !== "approved" || !assignment.rowCount || !appointment.rowCount || appointment.rows[0].claim_id !== claim.rows[0].id || appointment.rows[0].agent_id !== assignment.rows[0].agent_id || appointment.rows[0].claimant_id !== claim.rows[0].claimant_id || (!isClaimant && !isCurrentAgent)) {
+      await client.query("ROLLBACK"); return res.status(403).json({ error: "Only the claimant or currently assigned active verified Agent may cancel this appointment" });
+    }
+    if (!["requested","confirmed"].includes(appointment.rows[0].status)) {
+      await client.query("ROLLBACK"); return res.status(409).json({ error: "Only a requested or confirmed appointment can be cancelled" });
+    }
+    if (appointment.rows[0].status === "confirmed" && new Date(appointment.rows[0].ends_at) <= new Date()) {
+      await client.query("ROLLBACK"); return res.status(409).json({ error: "The scheduled end has passed; only the currently assigned Agent may record the no-show outcome" });
+    }
+    const updated = await client.query("UPDATE agent_appointments SET status='cancelled',updated_at=now() WHERE id=$1 AND status IN ('requested','confirmed') RETURNING id,status", [req.params.id]);
+    if (!updated.rowCount) { await client.query("ROLLBACK"); return res.status(409).json({ error: "Appointment changed before cancellation" }); }
+    const invalidated = await client.query("UPDATE handover_authorisations SET consumed_at=now() WHERE report_id=$1 AND claim_id=$2 AND assignment_id=$3 AND purpose='claimant_collection' AND consumed_at IS NULL", [claim.rows[0].report_id, claim.rows[0].id, assignment.rows[0].id]);
+    const actorType = isClaimant ? "claimant" : "agent";
+    await client.query("INSERT INTO audit_events(actor_id,action,resource_type,resource_id,outcome,metadata) VALUES($1,$2,'appointment',$3,'success',$4::jsonb)", [req.auth!.id, actorType+".collection_appointment_cancelled", req.params.id, JSON.stringify({ invalidatedCollectionAuthorisations: invalidated.rowCount })]);
+    await client.query("COMMIT");
+    res.json({ appointment: updated.rows[0], invalidatedCollectionAuthorisations: invalidated.rowCount, notice: "The appointment is cancelled. A new appointment request is required to reschedule." });
+  } catch (e) { await client.query("ROLLBACK"); next(e); } finally { client.release(); }
+});
+
+agentOperationsRouter.post("/appointments/:id/no-show", requireRole("agent"), async (req, res, next) => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const reference = await client.query("SELECT claim_id,assignment_id FROM agent_appointments WHERE id=$1", [req.params.id]);
+    if (!reference.rowCount) { await client.query("ROLLBACK"); return res.status(404).json({ error: "Appointment not found" }); }
+    const target = await client.query("SELECT report_id FROM claims WHERE id=$1", [reference.rows[0].claim_id]);
+    if (!target.rowCount) { await client.query("ROLLBACK"); return res.status(404).json({ error: "Appointment claim not found" }); }
+    await client.query("SELECT id FROM reports WHERE id=$1 FOR UPDATE", [target.rows[0].report_id]);
+    const claim = await client.query("SELECT id,report_id,claimant_id,status FROM claims WHERE id=$1 FOR UPDATE", [reference.rows[0].claim_id]);
+    const assignment = await client.query("SELECT x.id,x.agent_id,a.user_id,a.status agent_status,a.verified_at FROM assignments x JOIN agents a ON a.id=x.agent_id WHERE x.id=$1 AND x.report_id=$2 AND x.status='assigned' FOR UPDATE OF x,a", [reference.rows[0].assignment_id, target.rows[0].report_id]);
+    const appointment = await client.query("SELECT id,claim_id,assignment_id,agent_id,claimant_id,status,ends_at FROM agent_appointments WHERE id=$1 AND assignment_id=$2 FOR UPDATE", [req.params.id, reference.rows[0].assignment_id]);
+    if (!claim.rowCount || claim.rows[0].status !== "approved" || !assignment.rowCount || assignment.rows[0].user_id !== req.auth!.id || assignment.rows[0].agent_status !== "active" || !assignment.rows[0].verified_at || !appointment.rowCount || appointment.rows[0].claim_id !== claim.rows[0].id || appointment.rows[0].agent_id !== assignment.rows[0].agent_id || appointment.rows[0].claimant_id !== claim.rows[0].claimant_id) {
+      await client.query("ROLLBACK"); return res.status(403).json({ error: "Only the currently assigned active verified Agent may record this appointment outcome" });
+    }
+    if (appointment.rows[0].status !== "confirmed") {
+      await client.query("ROLLBACK"); return res.status(409).json({ error: "Only a confirmed appointment can be recorded as a no-show" });
+    }
+    if (new Date(appointment.rows[0].ends_at) > new Date()) {
+      await client.query("ROLLBACK"); return res.status(409).json({ error: "The confirmed appointment's scheduled end has not yet passed" });
+    }
+    const updated = await client.query("UPDATE agent_appointments SET status='no_show',updated_at=now() WHERE id=$1 AND status='confirmed' RETURNING id,status", [req.params.id]);
+    if (!updated.rowCount) { await client.query("ROLLBACK"); return res.status(409).json({ error: "Appointment changed before the no-show outcome was recorded" }); }
+    const invalidated = await client.query("UPDATE handover_authorisations SET consumed_at=now() WHERE report_id=$1 AND claim_id=$2 AND assignment_id=$3 AND purpose='claimant_collection' AND consumed_at IS NULL", [claim.rows[0].report_id, claim.rows[0].id, assignment.rows[0].id]);
+    await client.query("INSERT INTO audit_events(actor_id,action,resource_type,resource_id,outcome,metadata) VALUES($1,'agent.collection_appointment_no_show','appointment',$2,'success',$3::jsonb)", [req.auth!.id, req.params.id, JSON.stringify({ invalidatedCollectionAuthorisations: invalidated.rowCount, manuallyRecorded: true })]);
+    await client.query("COMMIT");
+    res.json({ appointment: updated.rows[0], invalidatedCollectionAuthorisations: invalidated.rowCount });
   } catch (e) { await client.query("ROLLBACK"); next(e); } finally { client.release(); }
 });
 

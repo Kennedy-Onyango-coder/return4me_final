@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+const routes = readFileSync("server/routes/agent-operations.ts", "utf8");
+const app = readFileSync("src/App.tsx", "utf8");
+const migration = readFileSync("server/db/migrations/0001_batch5_agent_custody.sql", "utf8");
+assert(routes.includes('patch("/appointments/:id/cancel", requireRole("claimant", "agent")'));
+assert(routes.includes('post("/appointments/:id/no-show", requireRole("agent")'));
+assert(routes.includes("purpose='claimant_collection' AND consumed_at IS NULL"));
+assert(routes.includes("claim.collection_appointment_request_expired"));
+assert.equal((routes.match(/SET status='no_show'/g) || []).length, 1, "no-show must have one explicit manual transition");
+assert(!/status IN \([^)]*'expired'/.test(migration), "do not introduce an unapproved appointment status");
+assert(app.includes("Latest appointment:") && app.includes("Record no-show") && app.includes("Cancel appointment"));
+console.log("Batch 67J appointment lifecycle source checks passed.");

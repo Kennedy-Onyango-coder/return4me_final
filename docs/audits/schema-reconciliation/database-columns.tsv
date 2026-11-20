@@ -1,0 +1,896 @@
+table_name	ordinal_position	column_name	data_type	udt_name	character_maximum_length	numeric_precision	numeric_scale	is_nullable	column_default
+admin_action_approvals	1	id	uuid	uuid				NO	gen_random_uuid()
+admin_action_approvals	2	action	character varying	varchar	100			NO	
+admin_action_approvals	3	resource_type	character varying	varchar	80			NO	
+admin_action_approvals	4	resource_id	character varying	varchar	120			NO	
+admin_action_approvals	5	proposed_by	uuid	uuid				NO	
+admin_action_approvals	6	proposal_reason	text	text				NO	
+admin_action_approvals	7	payload	jsonb	jsonb				NO	
+admin_action_approvals	8	status	character varying	varchar	24			NO	'pending'::character varying
+admin_action_approvals	9	reviewed_by	uuid	uuid				YES	
+admin_action_approvals	10	review_reason	text	text				YES	
+admin_action_approvals	11	expires_at	timestamp with time zone	timestamptz				NO	
+admin_action_approvals	12	created_at	timestamp with time zone	timestamptz				NO	now()
+admin_action_approvals	13	updated_at	timestamp with time zone	timestamptz				NO	now()
+admin_action_approvals	14	resolved_at	timestamp with time zone	timestamptz				YES	
+admin_step_up_grants	1	id	uuid	uuid				NO	gen_random_uuid()
+admin_step_up_grants	2	user_id	uuid	uuid				NO	
+admin_step_up_grants	3	session_id	uuid	uuid				NO	
+admin_step_up_grants	4	purpose	character varying	varchar	100			NO	
+admin_step_up_grants	5	verified_at	timestamp with time zone	timestamptz				NO	now()
+admin_step_up_grants	6	expires_at	timestamp with time zone	timestamptz				NO	
+admin_step_up_grants	7	consumed_at	timestamp with time zone	timestamptz				YES	
+admin_step_up_grants	8	created_at	timestamp with time zone	timestamptz				NO	now()
+agent_agreement_versions	1	id	uuid	uuid				NO	gen_random_uuid()
+agent_agreement_versions	2	version	character varying	varchar	40			NO	
+agent_agreement_versions	3	body	text	text				NO	
+agent_agreement_versions	4	body_sha256	character	bpchar	64			NO	
+agent_agreement_versions	5	legal_approved_by	uuid	uuid				YES	
+agent_agreement_versions	6	legal_approved_at	timestamp with time zone	timestamptz				YES	
+agent_agreement_versions	7	created_by	uuid	uuid				NO	
+agent_agreement_versions	8	created_at	timestamp with time zone	timestamptz				NO	now()
+agent_agreements	1	id	uuid	uuid				NO	gen_random_uuid()
+agent_agreements	2	agent_id	uuid	uuid				NO	
+agent_agreements	3	version_id	uuid	uuid				NO	
+agent_agreements	4	typed_full_name	character varying	varchar	180			NO	
+agent_agreements	5	agreement_sha256	character	bpchar	64			NO	
+agent_agreements	6	accepted_at	timestamp with time zone	timestamptz				NO	now()
+agent_agreements	7	accepted_by	uuid	uuid				NO	
+agent_appointments	1	id	uuid	uuid				NO	gen_random_uuid()
+agent_appointments	2	assignment_id	uuid	uuid				NO	
+agent_appointments	3	claim_id	uuid	uuid				YES	
+agent_appointments	4	agent_id	uuid	uuid				NO	
+agent_appointments	5	claimant_id	uuid	uuid				NO	
+agent_appointments	6	starts_at	timestamp with time zone	timestamptz				NO	
+agent_appointments	7	ends_at	timestamp with time zone	timestamptz				NO	
+agent_appointments	8	timezone	character varying	varchar	64			NO	'Africa/Nairobi'::character varying
+agent_appointments	9	status	character varying	varchar	20			NO	'requested'::character varying
+agent_appointments	10	requested_by	uuid	uuid				NO	
+agent_appointments	11	confirmed_by	uuid	uuid				YES	
+agent_appointments	12	confirmed_at	timestamp with time zone	timestamptz				YES	
+agent_appointments	13	created_at	timestamp with time zone	timestamptz				NO	now()
+agent_appointments	14	updated_at	timestamp with time zone	timestamptz				NO	now()
+agent_availability	1	id	uuid	uuid				NO	gen_random_uuid()
+agent_availability	2	agent_id	uuid	uuid				NO	
+agent_availability	3	available	boolean	bool				NO	false
+agent_availability	4	capacity_limit	integer	int4		32	0	NO	0
+agent_availability	5	current_load	integer	int4		32	0	NO	0
+agent_availability	6	effective_from	timestamp with time zone	timestamptz				NO	now()
+agent_availability	7	updated_at	timestamp with time zone	timestamptz				NO	now()
+agent_availability_windows	1	id	uuid	uuid				NO	gen_random_uuid()
+agent_availability_windows	2	agent_id	uuid	uuid				NO	
+agent_availability_windows	3	starts_at	timestamp with time zone	timestamptz				NO	
+agent_availability_windows	4	ends_at	timestamp with time zone	timestamptz				NO	
+agent_availability_windows	5	timezone	character varying	varchar	64			NO	'Africa/Nairobi'::character varying
+agent_availability_windows	6	published_at	timestamp with time zone	timestamptz				NO	now()
+agent_collection_checks	1	id	uuid	uuid				NO	gen_random_uuid()
+agent_collection_checks	2	assignment_id	uuid	uuid				NO	
+agent_collection_checks	3	claim_id	uuid	uuid				NO	
+agent_collection_checks	4	claimant_id	uuid	uuid				NO	
+agent_collection_checks	5	authority_status	character varying	varchar	20			NO	
+agent_collection_checks	6	identity_checked_by	uuid	uuid				NO	
+agent_collection_checks	7	identity_checked_at	timestamp with time zone	timestamptz				NO	now()
+agent_collection_checks	8	authority_evidence_ref	text	text				YES	
+agent_collection_checks	9	notes	text	text				YES	
+agent_collection_checks	10	created_at	timestamp with time zone	timestamptz				NO	now()
+agent_site_inspections	1	id	uuid	uuid				NO	gen_random_uuid()
+agent_site_inspections	2	agent_id	uuid	uuid				NO	
+agent_site_inspections	3	outcome	character varying	varchar	20			NO	
+agent_site_inspections	4	evidence_reference	text	text				YES	
+agent_site_inspections	5	findings	text	text				NO	
+agent_site_inspections	6	inspected_by	uuid	uuid				NO	
+agent_site_inspections	7	inspected_at	timestamp with time zone	timestamptz				NO	now()
+agent_site_inspections	8	created_at	timestamp with time zone	timestamptz				NO	now()
+agent_training_attempts	1	id	uuid	uuid				NO	gen_random_uuid()
+agent_training_attempts	2	agent_id	uuid	uuid				NO	
+agent_training_attempts	3	module_code	character varying	varchar	64			NO	
+agent_training_attempts	4	score_percent	integer	int4		32	0	NO	
+agent_training_attempts	5	passed	boolean	bool				NO	
+agent_training_attempts	6	attempted_at	timestamp with time zone	timestamptz				NO	now()
+agent_training_records	1	id	uuid	uuid				NO	gen_random_uuid()
+agent_training_records	2	agent_id	uuid	uuid				NO	
+agent_training_records	3	module_code	character varying	varchar	64			NO	
+agent_training_records	4	status	character varying	varchar	24			NO	'not_started'::character varying
+agent_training_records	5	score_percent	integer	int4		32	0	YES	
+agent_training_records	6	evidence_document_id	uuid	uuid				YES	
+agent_training_records	7	completed_at	timestamp with time zone	timestamptz				YES	
+agent_training_records	8	expires_at	timestamp with time zone	timestamptz				YES	
+agent_training_records	9	verified_by	uuid	uuid				YES	
+agent_training_records	10	created_at	timestamp with time zone	timestamptz				NO	now()
+agents	1	id	uuid	uuid				NO	gen_random_uuid()
+agents	2	user_id	uuid	uuid				NO	
+agents	3	business_name	character varying	varchar	180			NO	
+agents	4	service_address	character varying	varchar	240			NO	
+agents	5	service_phone	character varying	varchar	24			YES	
+agents	6	service_phone_verified_at	timestamp with time zone	timestamptz				YES	
+agents	7	county	character varying	varchar	80			NO	
+agents	8	capacity_notes	text	text				YES	
+agents	9	payout_destination_ref	text	text				YES	
+agents	10	status	character varying	varchar	24			NO	'pending'::character varying
+agents	11	verified_at	timestamp with time zone	timestamptz				YES	
+agents	12	created_at	timestamp with time zone	timestamptz				NO	now()
+assignments	1	id	uuid	uuid				NO	gen_random_uuid()
+assignments	2	report_id	uuid	uuid				NO	
+assignments	3	agent_id	uuid	uuid				NO	
+assignments	4	assigned_by	uuid	uuid				YES	
+assignments	5	status	character varying	varchar	32			NO	'assigned'::character varying
+assignments	6	assigned_at	timestamp with time zone	timestamptz				NO	now()
+assignments	7	completed_at	timestamp with time zone	timestamptz				YES	
+audit_events	1	id	uuid	uuid				NO	gen_random_uuid()
+audit_events	2	actor_id	uuid	uuid				YES	
+audit_events	3	action	character varying	varchar	100			NO	
+audit_events	4	resource_type	character varying	varchar	80			NO	
+audit_events	5	resource_id	character varying	varchar	120			YES	
+audit_events	6	outcome	character varying	varchar	30			NO	
+audit_events	7	metadata	jsonb	jsonb				NO	'{}'::jsonb
+audit_events	8	created_at	timestamp with time zone	timestamptz				NO	now()
+audit_events	9	correlation_id	character varying	varchar	80			YES	
+case_disputes	1	id	uuid	uuid				NO	gen_random_uuid()
+case_disputes	2	claim_id	uuid	uuid				NO	
+case_disputes	3	report_id	uuid	uuid				NO	
+case_disputes	4	opened_by	uuid	uuid				NO	
+case_disputes	5	reason_code	character varying	varchar	48			NO	
+case_disputes	6	description	text	text				NO	
+case_disputes	7	status	character varying	varchar	24			NO	'open'::character varying
+case_disputes	8	release_hold	boolean	bool				NO	true
+case_disputes	9	settlement_hold	boolean	bool				NO	true
+case_disputes	10	resolution	text	text				YES	
+case_disputes	11	resolved_by	uuid	uuid				YES	
+case_disputes	12	resolved_at	timestamp with time zone	timestamptz				YES	
+case_disputes	13	created_at	timestamp with time zone	timestamptz				NO	now()
+category_proposals	1	id	uuid	uuid				NO	gen_random_uuid()
+category_proposals	2	proposed_name	character varying	varchar	100			NO	
+category_proposals	3	explanation	text	text				NO	
+category_proposals	4	proposed_by	uuid	uuid				YES	
+category_proposals	5	proposed_email	character varying	varchar	320			YES	
+category_proposals	6	report_id	uuid	uuid				YES	
+category_proposals	7	status	character varying	varchar	24			NO	'pending'::character varying
+category_proposals	8	reviewed_by	uuid	uuid				YES	
+category_proposals	9	reviewed_at	timestamp with time zone	timestamptz				YES	
+category_proposals	10	created_at	timestamp with time zone	timestamptz				NO	now()
+category_proposals	11	review_reason_code	character varying	varchar	48			YES	
+category_proposals	12	review_note	character varying	varchar	500			YES	
+claim_appeals	1	id	uuid	uuid				NO	gen_random_uuid()
+claim_appeals	2	claim_id	uuid	uuid				NO	
+claim_appeals	3	submitted_by	uuid	uuid				NO	
+claim_appeals	4	grounds	text	text				NO	
+claim_appeals	5	status	character varying	varchar	24			NO	'submitted'::character varying
+claim_appeals	6	reviewer_note	text	text				YES	
+claim_appeals	7	reviewed_by	uuid	uuid				YES	
+claim_appeals	8	reviewed_at	timestamp with time zone	timestamptz				YES	
+claim_appeals	9	created_at	timestamp with time zone	timestamptz				NO	now()
+claim_evidence	1	id	uuid	uuid				NO	gen_random_uuid()
+claim_evidence	2	claim_id	uuid	uuid				NO	
+claim_evidence	3	document_id	uuid	uuid				NO	
+claim_evidence	4	evidence_type	character varying	varchar	48			NO	
+claim_evidence	5	verification_status	character varying	varchar	24			NO	'under_review'::character varying
+claim_evidence	6	reviewer_id	uuid	uuid				YES	
+claim_evidence	7	reviewer_note	text	text				YES	
+claim_evidence	8	reviewed_at	timestamp with time zone	timestamptz				YES	
+claim_evidence	9	created_at	timestamp with time zone	timestamptz				NO	now()
+claims	1	id	uuid	uuid				NO	gen_random_uuid()
+claims	2	reference	character varying	varchar	24			NO	
+claims	3	report_id	uuid	uuid				NO	
+claims	4	claimant_id	uuid	uuid				NO	
+claims	5	ownership_evidence_summary	text	text				YES	
+claims	6	claimant_relationship	character varying	varchar	40			NO	'owner'::character varying
+claims	7	represented_person_name	character varying	varchar	180			YES	
+claims	8	authority_declaration	text	text				YES	
+claims	9	authority_verification_status	character varying	varchar	24			NO	'not_required'::character varying
+claims	10	authority_verified_by	uuid	uuid				YES	
+claims	11	authority_verified_at	timestamp with time zone	timestamptz				YES	
+claims	12	status	USER-DEFINED	claim_status				NO	'submitted'::claim_status
+claims	13	reviewed_by	uuid	uuid				YES	
+claims	14	reviewed_at	timestamp with time zone	timestamptz				YES	
+claims	15	approved_at	timestamp with time zone	timestamptz				YES	
+claims	16	dispute_reason	text	text				YES	
+claims	17	created_at	timestamp with time zone	timestamptz				NO	now()
+claims	18	updated_at	timestamp with time zone	timestamptz				NO	now()
+communication_consents	1	id	uuid	uuid				NO	gen_random_uuid()
+communication_consents	2	user_id	uuid	uuid				NO	
+communication_consents	3	channel	character varying	varchar	16			NO	
+communication_consents	4	purpose	character varying	varchar	32			NO	
+communication_consents	5	status	character varying	varchar	12			NO	
+communication_consents	6	policy_version	character varying	varchar	40			NO	
+communication_consents	7	consent_text_hash	character varying	varchar	64			NO	
+communication_consents	8	source	character varying	varchar	24			NO	'account_settings'::character varying
+communication_consents	9	granted_at	timestamp with time zone	timestamptz				YES	
+communication_consents	10	revoked_at	timestamp with time zone	timestamptz				YES	
+communication_consents	11	created_at	timestamp with time zone	timestamptz				NO	now()
+communications_campaigns	1	id	uuid	uuid				NO	gen_random_uuid()
+communications_campaigns	2	title	character varying	varchar	180			NO	
+communications_campaigns	3	purpose	character varying	varchar	80			NO	
+communications_campaigns	4	status	character varying	varchar	24			NO	'draft'::character varying
+communications_campaigns	5	created_by	uuid	uuid				NO	
+communications_campaigns	6	approved_by	uuid	uuid				YES	
+communications_campaigns	7	approved_at	timestamp with time zone	timestamptz				YES	
+communications_campaigns	8	scheduled_at	timestamp with time zone	timestamptz				YES	
+communications_campaigns	9	created_at	timestamp with time zone	timestamptz				NO	now()
+communications_campaigns	10	report_id	uuid	uuid				YES	
+communications_campaigns	11	withdrawn_at	timestamp with time zone	timestamptz				YES	
+communications_campaigns	12	withdrawn_by	uuid	uuid				YES	
+communications_campaigns	13	withdrawal_reason	character varying	varchar	1000			YES	
+communications_delivery_events	1	id	uuid	uuid				NO	gen_random_uuid()
+communications_delivery_events	2	channel	character varying	varchar	16			NO	
+communications_delivery_events	3	provider	character varying	varchar	32			NO	
+communications_delivery_events	4	provider_event_id	character varying	varchar	180			NO	
+communications_delivery_events	5	event_type	character varying	varchar	32			NO	
+communications_delivery_events	6	recipient_hash	character varying	varchar	64			YES	
+communications_delivery_events	7	message_reference_hash	character varying	varchar	64			YES	
+communications_delivery_events	8	occurred_at	timestamp with time zone	timestamptz				NO	
+communications_delivery_events	9	metadata	jsonb	jsonb				NO	'{}'::jsonb
+communications_delivery_events	10	created_at	timestamp with time zone	timestamptz				NO	now()
+communications_governance	1	singleton_id	integer	int4		32	0	NO	1
+communications_governance	2	approver_user_id	uuid	uuid				YES	
+communications_governance	3	publisher_user_id	uuid	uuid				YES	
+communications_governance	4	updated_by	uuid	uuid				YES	
+communications_governance	5	updated_at	timestamp with time zone	timestamptz				NO	now()
+communications_publications	1	id	uuid	uuid				NO	gen_random_uuid()
+communications_publications	2	campaign_id	uuid	uuid				NO	
+communications_publications	3	channel	character varying	varchar	24			NO	
+communications_publications	4	body	text	text				NO	
+communications_publications	5	status	character varying	varchar	24			NO	'pending'::character varying
+communications_publications	6	external_reference	character varying	varchar	180			YES	
+communications_publications	7	attempts	integer	int4		32	0	NO	0
+communications_publications	8	last_error_code	character varying	varchar	80			YES	
+communications_publications	9	published_at	timestamp with time zone	timestamptz				YES	
+communications_publications	10	created_at	timestamp with time zone	timestamptz				NO	now()
+communications_publications	11	published_by	uuid	uuid				YES	
+communications_publications	12	withdrawn_at	timestamp with time zone	timestamptz				YES	
+communications_publications	13	withdrawn_by	uuid	uuid				YES	
+communications_publications	14	withdrawal_reason	character varying	varchar	1000			YES	
+communications_templates	1	id	uuid	uuid				NO	gen_random_uuid()
+communications_templates	2	code	character varying	varchar	80			NO	
+communications_templates	3	channel	character varying	varchar	24			NO	
+communications_templates	4	version	integer	int4		32	0	NO	
+communications_templates	5	subject	character varying	varchar	200			YES	
+communications_templates	6	body	text	text				NO	
+communications_templates	7	status	character varying	varchar	24			NO	'draft'::character varying
+communications_templates	8	created_by	uuid	uuid				NO	
+communications_templates	9	approved_by	uuid	uuid				YES	
+communications_templates	10	approved_at	timestamp with time zone	timestamptz				YES	
+communications_templates	11	created_at	timestamp with time zone	timestamptz				NO	now()
+custody_events	1	id	uuid	uuid				NO	gen_random_uuid()
+custody_events	2	report_id	uuid	uuid				NO	
+custody_events	3	agent_id	uuid	uuid				NO	
+custody_events	4	event_type	character varying	varchar	40			NO	
+custody_events	5	evidence_ref	text	text				YES	
+custody_events	6	notes	text	text				YES	
+custody_events	7	actor_id	uuid	uuid				NO	
+custody_events	8	created_at	timestamp with time zone	timestamptz				NO	now()
+custody_events	9	previous_hash	character varying	varchar	64			YES	
+custody_events	10	event_hash	character varying	varchar	64			YES	
+custody_events	11	sequence_no	integer	int4		32	0	YES	
+custody_events	12	hash_version	character varying	varchar	8			NO	'v2'::character varying
+custody_handover_confirmations	1	id	uuid	uuid				NO	gen_random_uuid()
+custody_handover_confirmations	2	report_id	uuid	uuid				NO	
+custody_handover_confirmations	3	claim_id	uuid	uuid				NO	
+custody_handover_confirmations	4	assignment_id	uuid	uuid				NO	
+custody_handover_confirmations	5	claimant_id	uuid	uuid				NO	
+custody_handover_confirmations	6	agent_id	uuid	uuid				NO	
+custody_handover_confirmations	7	confirmed_at	timestamp with time zone	timestamptz				NO	now()
+custody_transfer_confirmations	1	id	uuid	uuid				NO	gen_random_uuid()
+custody_transfer_confirmations	2	assignment_id	uuid	uuid				NO	
+custody_transfer_confirmations	3	actor_id	uuid	uuid				NO	
+custody_transfer_confirmations	4	actor_role	character varying	varchar	16			NO	
+custody_transfer_confirmations	5	confirmed_at	timestamp with time zone	timestamptz				NO	now()
+data_rights_requests	1	id	uuid	uuid				NO	gen_random_uuid()
+data_rights_requests	2	user_id	uuid	uuid				NO	
+data_rights_requests	3	request_type	character varying	varchar	24			NO	
+data_rights_requests	4	details	character varying	varchar	1500			NO	
+data_rights_requests	5	status	character varying	varchar	24			NO	'received'::character varying
+data_rights_requests	6	reviewed_by	uuid	uuid				YES	
+data_rights_requests	7	review_note	character varying	varchar	1500			YES	
+data_rights_requests	8	created_at	timestamp with time zone	timestamptz				NO	now()
+data_rights_requests	9	updated_at	timestamp with time zone	timestamptz				NO	now()
+data_rights_requests	10	resolved_at	timestamp with time zone	timestamptz				YES	
+distributed_rate_limits	1	key_hash	character	bpchar	64			NO	
+distributed_rate_limits	2	total_hits	integer	int4		32	0	NO	
+distributed_rate_limits	3	expires_at	timestamp with time zone	timestamptz				NO	
+document_access_events	1	id	uuid	uuid				NO	gen_random_uuid()
+document_access_events	2	document_id	uuid	uuid				NO	
+document_access_events	3	actor_id	uuid	uuid				NO	
+document_access_events	4	access_purpose	character varying	varchar	80			NO	
+document_access_events	5	outcome	character varying	varchar	24			NO	
+document_access_events	6	created_at	timestamp with time zone	timestamptz				NO	now()
+document_scan_events	1	id	uuid	uuid				NO	gen_random_uuid()
+document_scan_events	2	document_id	uuid	uuid				NO	
+document_scan_events	3	scanner	character varying	varchar	80			NO	
+document_scan_events	4	result	character varying	varchar	24			NO	
+document_scan_events	5	signature	character varying	varchar	128			YES	
+document_scan_events	6	details_code	character varying	varchar	80			YES	
+document_scan_events	7	scanned_at	timestamp with time zone	timestamptz				NO	now()
+document_storage_deletion_outbox	1	id	uuid	uuid				NO	gen_random_uuid()
+document_storage_deletion_outbox	2	document_id	uuid	uuid				NO	
+document_storage_deletion_outbox	3	storage_key	text	text				NO	
+document_storage_deletion_outbox	4	status	character varying	varchar	16			NO	'pending'::character varying
+document_storage_deletion_outbox	5	attempt_count	integer	int4		32	0	NO	0
+document_storage_deletion_outbox	6	next_attempt_at	timestamp with time zone	timestamptz				NO	now()
+document_storage_deletion_outbox	7	last_error_code	character varying	varchar	80			YES	
+document_storage_deletion_outbox	8	deleted_at	timestamp with time zone	timestamptz				YES	
+document_storage_deletion_outbox	9	created_at	timestamp with time zone	timestamptz				NO	now()
+document_storage_deletion_outbox	10	updated_at	timestamp with time zone	timestamptz				NO	now()
+documents	1	id	uuid	uuid				NO	gen_random_uuid()
+documents	2	owner_id	uuid	uuid				NO	
+documents	3	resource_type	character varying	varchar	60			NO	
+documents	4	resource_id	character varying	varchar	120			NO	
+documents	5	storage_key	text	text				NO	
+documents	6	preview_storage_key	text	text				YES	
+documents	7	original_filename	character varying	varchar	255			NO	
+documents	8	mime_type	character varying	varchar	120			NO	
+documents	9	size_bytes	integer	int4		32	0	NO	
+documents	10	sha256	character varying	varchar	64			NO	
+documents	11	scan_status	character varying	varchar	24			NO	'pending'::character varying
+documents	12	verification_status	character varying	varchar	24			NO	'uploaded'::character varying
+documents	13	expires_at	timestamp with time zone	timestamptz				YES	
+documents	14	deleted_at	timestamp with time zone	timestamptz				YES	
+documents	15	created_at	timestamp with time zone	timestamptz				NO	now()
+dormant_liability_reviews	1	id	uuid	uuid				NO	gen_random_uuid()
+dormant_liability_reviews	2	liability_type	character varying	varchar	32			NO	
+dormant_liability_reviews	3	liability_reference	character varying	varchar	160			NO	
+dormant_liability_reviews	4	beneficiary_user_id	uuid	uuid				YES	
+dormant_liability_reviews	5	amount_kes	numeric	numeric		14	2	NO	
+dormant_liability_reviews	6	currency	character varying	varchar	3			NO	'KES'::character varying
+dormant_liability_reviews	7	aging_days	integer	int4		32	0	NO	
+dormant_liability_reviews	8	review_status	character varying	varchar	24			NO	'needs_contact'::character varying
+dormant_liability_reviews	9	last_contact_at	timestamp with time zone	timestamptz				YES	
+dormant_liability_reviews	10	evidence_reference	character varying	varchar	500			YES	
+dormant_liability_reviews	11	reviewed_by	uuid	uuid				YES	
+dormant_liability_reviews	12	review_note	character varying	varchar	1500			YES	
+dormant_liability_reviews	13	created_at	timestamp with time zone	timestamptz				NO	now()
+dormant_liability_reviews	14	updated_at	timestamp with time zone	timestamptz				NO	now()
+finance_period_close_requests	1	id	uuid	uuid				NO	gen_random_uuid()
+finance_period_close_requests	2	period_start	date	date				NO	
+finance_period_close_requests	3	period_end	date	date				NO	
+finance_period_close_requests	4	snapshot_hash	character varying	varchar	64			NO	
+finance_period_close_requests	5	snapshot_payload	jsonb	jsonb				NO	
+finance_period_close_requests	6	evidence_reference	character varying	varchar	500			NO	
+finance_period_close_requests	7	submitted_by	uuid	uuid				NO	
+finance_period_close_requests	8	status	character varying	varchar	32			NO	'submitted'::character varying
+finance_period_close_requests	9	reviewed_by	uuid	uuid				YES	
+finance_period_close_requests	10	review_note	character varying	varchar	1500			YES	
+finance_period_close_requests	11	submitted_at	timestamp with time zone	timestamptz				NO	now()
+finance_period_close_requests	12	reviewed_at	timestamp with time zone	timestamptz				YES	
+financial_journals	1	id	uuid	uuid				NO	gen_random_uuid()
+financial_journals	2	source_type	character varying	varchar	32			NO	
+financial_journals	3	source_id	character varying	varchar	160			NO	
+financial_journals	4	idempotency_key	character varying	varchar	160			NO	
+financial_journals	5	currency	character	bpchar	3			NO	'KES'::bpchar
+financial_journals	6	memo	text	text				NO	
+financial_journals	7	created_by	uuid	uuid				YES	
+financial_journals	8	created_txid	bigint	int8		64	0	NO	txid_current()
+financial_journals	9	created_at	timestamp with time zone	timestamptz				NO	now()
+financial_postings	1	id	uuid	uuid				NO	gen_random_uuid()
+financial_postings	2	journal_id	uuid	uuid				NO	
+financial_postings	3	account_code	character varying	varchar	60			NO	
+financial_postings	4	debit_kes	numeric	numeric		14	2	NO	0
+financial_postings	5	credit_kes	numeric	numeric		14	2	NO	0
+financial_postings	6	memo	text	text				YES	
+financial_postings	7	created_at	timestamp with time zone	timestamptz				NO	now()
+guest_report_access	1	id	uuid	uuid				NO	gen_random_uuid()
+guest_report_access	2	report_id	uuid	uuid				NO	
+guest_report_access	3	email	character varying	varchar	320			NO	
+guest_report_access	4	token_hash	character varying	varchar	128			NO	
+guest_report_access	5	expires_at	timestamp with time zone	timestamptz				NO	
+guest_report_access	6	revoked_at	timestamp with time zone	timestamptz				YES	
+guest_report_access	7	created_at	timestamp with time zone	timestamptz				NO	now()
+guest_report_verifications	1	id	uuid	uuid				NO	gen_random_uuid()
+guest_report_verifications	2	email	character varying	varchar	320			NO	
+guest_report_verifications	3	token_hash	character varying	varchar	128			NO	
+guest_report_verifications	4	expires_at	timestamp with time zone	timestamptz				NO	
+guest_report_verifications	5	consumed_at	timestamp with time zone	timestamptz				YES	
+guest_report_verifications	6	created_at	timestamp with time zone	timestamptz				NO	now()
+handover_authorisations	1	id	uuid	uuid				NO	gen_random_uuid()
+handover_authorisations	2	report_id	uuid	uuid				NO	
+handover_authorisations	3	claim_id	uuid	uuid				YES	
+handover_authorisations	4	assignment_id	uuid	uuid				YES	
+handover_authorisations	5	purpose	character varying	varchar	32			NO	
+handover_authorisations	6	code_hash	character varying	varchar	128			NO	
+handover_authorisations	7	expires_at	timestamp with time zone	timestamptz				NO	
+handover_authorisations	8	attempts	integer	int4		32	0	NO	0
+handover_authorisations	9	consumed_at	timestamp with time zone	timestamptz				YES	
+handover_authorisations	10	created_by	uuid	uuid				NO	
+handover_authorisations	11	created_at	timestamp with time zone	timestamptz				NO	now()
+item_categories	1	id	uuid	uuid				NO	gen_random_uuid()
+item_categories	2	name	character varying	varchar	100			NO	
+item_categories	3	slug	character varying	varchar	110			NO	
+item_categories	4	description	text	text				YES	
+item_categories	5	active	boolean	bool				NO	true
+item_categories	6	created_by	uuid	uuid				NO	
+item_categories	7	created_at	timestamp with time zone	timestamptz				NO	now()
+ledger_entries	1	id	uuid	uuid				NO	gen_random_uuid()
+ledger_entries	2	transaction_id	uuid	uuid				NO	
+ledger_entries	3	entry_type	character varying	varchar	40			NO	
+ledger_entries	4	amount_kes	numeric	numeric		14	2	NO	
+ledger_entries	5	account_code	character varying	varchar	60			NO	
+ledger_entries	6	memo	text	text				YES	
+ledger_entries	7	created_at	timestamp with time zone	timestamptz				NO	now()
+match_candidates	1	id	uuid	uuid				NO	gen_random_uuid()
+match_candidates	2	lost_report_id	uuid	uuid				NO	
+match_candidates	3	found_report_id	uuid	uuid				NO	
+match_candidates	4	match_tier	character varying	varchar	32			NO	
+match_candidates	5	score	integer	int4		32	0	NO	
+match_candidates	6	reasons	jsonb	jsonb				NO	'[]'::jsonb
+match_candidates	7	status	character varying	varchar	32			NO	'pending_review'::character varying
+match_candidates	8	reviewed_by	uuid	uuid				YES	
+match_candidates	9	reviewed_at	timestamp with time zone	timestamptz				YES	
+match_candidates	10	created_at	timestamp with time zone	timestamptz				NO	now()
+notification_outbox	1	id	uuid	uuid				NO	gen_random_uuid()
+notification_outbox	2	user_id	uuid	uuid				NO	
+notification_outbox	3	type	character varying	varchar	60			NO	
+notification_outbox	4	title	character varying	varchar	180			NO	
+notification_outbox	5	body	text	text				NO	
+notification_outbox	6	link	text	text				YES	
+notification_outbox	7	status	character varying	varchar	24			NO	'pending'::character varying
+notification_outbox	8	attempt_count	integer	int4		32	0	NO	0
+notification_outbox	9	next_attempt_at	timestamp with time zone	timestamptz				NO	now()
+notification_outbox	10	last_error_code	character varying	varchar	64			YES	
+notification_outbox	11	created_at	timestamp with time zone	timestamptz				NO	now()
+notification_outbox	12	delivered_at	timestamp with time zone	timestamptz				YES	
+notification_outbox	13	category	character varying	varchar	32			NO	'service'::character varying
+notification_outbox	14	priority	character varying	varchar	16			NO	'normal'::character varying
+notification_outbox	15	dedupe_key	character varying	varchar	180			YES	
+notification_preferences	1	user_id	uuid	uuid				NO	
+notification_preferences	2	in_app_community_updates	boolean	bool				NO	true
+notification_preferences	3	email_community_updates	boolean	bool				NO	false
+notification_preferences	4	sms_community_updates	boolean	bool				NO	false
+notification_preferences	5	updated_at	timestamp with time zone	timestamptz				NO	now()
+notifications	1	id	uuid	uuid				NO	gen_random_uuid()
+notifications	2	user_id	uuid	uuid				NO	
+notifications	3	type	character varying	varchar	60			NO	
+notifications	4	title	character varying	varchar	180			NO	
+notifications	5	body	text	text				NO	
+notifications	6	link	text	text				YES	
+notifications	7	read_at	timestamp with time zone	timestamptz				YES	
+notifications	8	created_at	timestamp with time zone	timestamptz				NO	now()
+notifications	9	outbox_id	uuid	uuid				YES	
+notifications	10	category	character varying	varchar	32			NO	'service'::character varying
+notifications	11	priority	character varying	varchar	16			NO	'normal'::character varying
+organisation_activities	1	id	uuid	uuid				NO	gen_random_uuid()
+organisation_activities	2	organisation_id	uuid	uuid				NO	
+organisation_activities	3	actor_id	uuid	uuid				NO	
+organisation_activities	4	action	character varying	varchar	100			NO	
+organisation_activities	5	resource_type	character varying	varchar	60			NO	
+organisation_activities	6	resource_id	character varying	varchar	120			YES	
+organisation_activities	7	metadata	jsonb	jsonb				NO	'{}'::jsonb
+organisation_activities	8	created_at	timestamp with time zone	timestamptz				NO	now()
+organisation_invitations	1	id	uuid	uuid				NO	gen_random_uuid()
+organisation_invitations	2	organisation_id	uuid	uuid				NO	
+organisation_invitations	3	email	character varying	varchar	320			NO	
+organisation_invitations	4	permission	character varying	varchar	40			NO	
+organisation_invitations	5	token_hash	character varying	varchar	128			NO	
+organisation_invitations	6	invited_by	uuid	uuid				NO	
+organisation_invitations	7	expires_at	timestamp with time zone	timestamptz				NO	
+organisation_invitations	8	accepted_at	timestamp with time zone	timestamptz				YES	
+organisation_invitations	9	revoked_at	timestamp with time zone	timestamptz				YES	
+organisation_invitations	10	created_at	timestamp with time zone	timestamptz				NO	now()
+organisation_members	1	id	uuid	uuid				NO	gen_random_uuid()
+organisation_members	2	organisation_id	uuid	uuid				NO	
+organisation_members	3	user_id	uuid	uuid				NO	
+organisation_members	4	permission	character varying	varchar	40			NO	'report_viewer'::character varying
+organisation_members	5	invited_by	uuid	uuid				YES	
+organisation_members	6	accepted_at	timestamp with time zone	timestamptz				YES	
+organisation_members	7	revoked_at	timestamp with time zone	timestamptz				YES	
+organisations	1	id	uuid	uuid				NO	gen_random_uuid()
+organisations	2	name	character varying	varchar	220			NO	
+organisations	3	registration_number	character varying	varchar	120			YES	
+organisations	4	county	character varying	varchar	80			NO	
+organisations	5	status	character varying	varchar	24			NO	'pending'::character varying
+organisations	6	verified_at	timestamp with time zone	timestamptz				YES	
+organisations	7	created_at	timestamp with time zone	timestamptz				NO	now()
+otp_challenges	1	id	uuid	uuid				NO	gen_random_uuid()
+otp_challenges	2	email	character varying	varchar	320			NO	
+otp_challenges	3	code_hash	character varying	varchar	128			NO	
+otp_challenges	4	purpose	character varying	varchar	40			NO	
+otp_challenges	5	expires_at	timestamp with time zone	timestamptz				NO	
+otp_challenges	6	attempts	integer	int4		32	0	NO	0
+otp_challenges	7	consumed_at	timestamp with time zone	timestamptz				YES	
+otp_challenges	8	created_at	timestamp with time zone	timestamptz				NO	now()
+payment_assessments	1	id	uuid	uuid				NO	gen_random_uuid()
+payment_assessments	2	claim_id	uuid	uuid				NO	
+payment_assessments	3	schedule_id	uuid	uuid				NO	
+payment_assessments	4	amount_kes	numeric	numeric		12	2	NO	
+payment_assessments	5	line_items	jsonb	jsonb				NO	'[]'::jsonb
+payment_assessments	6	status	character varying	varchar	24			NO	'draft'::character varying
+payment_assessments	7	confirmed_by	uuid	uuid				YES	
+payment_assessments	8	confirmed_at	timestamp with time zone	timestamptz				YES	
+payment_assessments	9	created_by	uuid	uuid				NO	
+payment_assessments	10	created_at	timestamp with time zone	timestamptz				NO	now()
+payment_assessments	11	payment_window_expires_at	timestamp with time zone	timestamptz				YES	
+payment_receipts	1	id	uuid	uuid				NO	gen_random_uuid()
+payment_receipts	2	receipt_number	character varying	varchar	48			NO	
+payment_receipts	3	payment_transaction_id	uuid	uuid				NO	
+payment_receipts	4	claimant_id	uuid	uuid				NO	
+payment_receipts	5	amount_kes	numeric	numeric		14	2	NO	
+payment_receipts	6	currency	character varying	varchar	3			NO	'KES'::character varying
+payment_receipts	7	issued_at	timestamp with time zone	timestamptz				NO	now()
+payment_receipts	8	receipt_kind	character varying	varchar	32			NO	'payment_confirmation'::character varying
+payment_receipts	9	disclaimer	text	text				NO	
+payment_transactions	1	id	uuid	uuid				NO	gen_random_uuid()
+payment_transactions	2	claim_id	uuid	uuid				NO	
+payment_transactions	3	provider	character varying	varchar	40			NO	'intasend'::character varying
+payment_transactions	4	provider_reference	character varying	varchar	180			YES	
+payment_transactions	5	amount_kes	numeric	numeric		14	2	NO	
+payment_transactions	6	status	USER-DEFINED	payment_status				NO	'initiated'::payment_status
+payment_transactions	7	idempotency_key	character varying	varchar	120			NO	
+payment_transactions	8	confirmed_at	timestamp with time zone	timestamptz				YES	
+payment_transactions	9	created_at	timestamp with time zone	timestamptz				NO	now()
+payment_transactions	10	assessment_id	uuid	uuid				YES	
+payment_transactions	11	provider_invoice_id	character varying	varchar	180			YES	
+payment_transactions	12	payer_phone_masked	character varying	varchar	24			YES	
+payment_transactions	13	session_expires_at	timestamp with time zone	timestamptz				YES	
+payment_transactions	14	provider_state	character varying	varchar	32			YES	
+payment_transactions	15	provider_receipt	character varying	varchar	80			YES	
+payment_transactions	16	last_verified_at	timestamp with time zone	timestamptz				YES	
+payment_transactions	17	updated_at	timestamp with time zone	timestamptz				NO	now()
+payment_transactions	18	provider_fee_kes	numeric	numeric		14	2	YES	
+payment_transactions	19	provider_fee_verified_at	timestamp with time zone	timestamptz				YES	
+payment_transactions	20	payer_phone_ciphertext	text	text				YES	
+payment_transactions	21	payer_phone_fingerprint	character varying	varchar	64			YES	
+payment_webhook_deliveries	1	id	uuid	uuid				NO	gen_random_uuid()
+payment_webhook_deliveries	2	provider	character varying	varchar	40			NO	'intasend'::character varying
+payment_webhook_deliveries	3	provider_event_key	character varying	varchar	220			NO	
+payment_webhook_deliveries	4	provider_invoice_id	character varying	varchar	180			YES	
+payment_webhook_deliveries	5	api_reference	character varying	varchar	120			YES	
+payment_webhook_deliveries	6	topic	character varying	varchar	60			YES	
+payment_webhook_deliveries	7	state	character varying	varchar	32			YES	
+payment_webhook_deliveries	8	authenticated	boolean	bool				NO	false
+payment_webhook_deliveries	9	outcome	character varying	varchar	40			NO	'received'::character varying
+payment_webhook_deliveries	10	received_at	timestamp with time zone	timestamptz				NO	now()
+payment_webhook_deliveries	11	processed_at	timestamp with time zone	timestamptz				YES	
+payout_destination_verification_events	1	id	uuid	uuid				NO	gen_random_uuid()
+payout_destination_verification_events	2	payout_destination_id	uuid	uuid				NO	
+payout_destination_verification_events	3	beneficiary_user_id	uuid	uuid				NO	
+payout_destination_verification_events	4	verifier_user_id	uuid	uuid				NO	
+payout_destination_verification_events	5	outcome	character varying	varchar	24			NO	
+payout_destination_verification_events	6	evidence_reference_hash	character varying	varchar	64			NO	
+payout_destination_verification_events	7	note	character varying	varchar	1000			NO	
+payout_destination_verification_events	8	verified_at	timestamp with time zone	timestamptz				NO	now()
+payout_destinations	1	id	uuid	uuid				NO	gen_random_uuid()
+payout_destinations	2	user_id	uuid	uuid				NO	
+payout_destinations	3	method	character varying	varchar	24			NO	'mpesa_b2c'::character varying
+payout_destinations	4	phone_masked	character varying	varchar	24			NO	
+payout_destinations	5	phone_ciphertext	text	text				NO	
+payout_destinations	6	fingerprint	character varying	varchar	64			NO	
+payout_destinations	7	status	character varying	varchar	24			NO	'pending'::character varying
+payout_destinations	8	verified_by	uuid	uuid				YES	
+payout_destinations	9	verified_at	timestamp with time zone	timestamptz				YES	
+payout_destinations	10	evidence_ref	text	text				YES	
+payout_destinations	11	created_at	timestamp with time zone	timestamptz				NO	now()
+payout_destinations	12	updated_at	timestamp with time zone	timestamptz				NO	now()
+payout_requests	1	id	uuid	uuid				NO	gen_random_uuid()
+payout_requests	2	settlement_id	uuid	uuid				NO	
+payout_requests	3	beneficiary_user_id	uuid	uuid				NO	
+payout_requests	4	amount_kes	numeric	numeric		14	2	NO	
+payout_requests	5	destination_fingerprint	character varying	varchar	128			NO	
+payout_requests	6	status	character varying	varchar	24			NO	'draft'::character varying
+payout_requests	7	initiated_by	uuid	uuid				YES	
+payout_requests	8	approved_by	uuid	uuid				YES	
+payout_requests	9	provider_reference	character varying	varchar	180			YES	
+payout_requests	10	provider_confirmed_at	timestamp with time zone	timestamptz				YES	
+payout_requests	11	created_at	timestamp with time zone	timestamptz				NO	now()
+payout_requests	12	destination_ciphertext	text	text				YES	
+payout_requests	13	created_by	uuid	uuid				YES	
+payout_requests	14	executed_by	uuid	uuid				YES	
+payout_requests	15	idempotency_key	character varying	varchar	120			NO	(gen_random_uuid())::text
+payout_requests	16	provider_batch_id	character varying	varchar	180			YES	
+payout_requests	17	provider_transaction_id	character varying	varchar	180			YES	
+payout_requests	18	provider_outcome	character varying	varchar	24			YES	
+payout_requests	19	provider_fee_kes	numeric	numeric		14	2	YES	
+payout_requests	20	provider_fee_verified_at	timestamp with time zone	timestamptz				YES	
+payout_requests	21	submitted_at	timestamp with time zone	timestamptz				YES	
+payout_requests	22	updated_at	timestamp with time zone	timestamptz				NO	now()
+policy_versions	1	id	uuid	uuid				NO	gen_random_uuid()
+policy_versions	2	policy_code	character varying	varchar	80			NO	
+policy_versions	3	version	character varying	varchar	40			NO	
+policy_versions	4	content_hash	character varying	varchar	128			NO	
+policy_versions	5	status	character varying	varchar	24			NO	'draft'::character varying
+policy_versions	6	approved_by	uuid	uuid				YES	
+policy_versions	7	approved_at	timestamp with time zone	timestamptz				YES	
+policy_versions	8	effective_from	timestamp with time zone	timestamptz				YES	
+policy_versions	9	created_at	timestamp with time zone	timestamptz				NO	now()
+pricing_rules	1	id	uuid	uuid				NO	gen_random_uuid()
+pricing_rules	2	schedule_id	uuid	uuid				NO	
+pricing_rules	3	category_id	uuid	uuid				NO	
+pricing_rules	4	subcategory	character varying	varchar	100			YES	
+pricing_rules	5	amount_kes	numeric	numeric		12	2	NO	
+pricing_rules	6	rule_priority	integer	int4		32	0	NO	10
+pricing_rules	7	active	boolean	bool				NO	true
+pricing_rules	8	created_at	timestamp with time zone	timestamptz				NO	now()
+pricing_schedules	1	id	uuid	uuid				NO	gen_random_uuid()
+pricing_schedules	2	version	character varying	varchar	40			NO	
+pricing_schedules	3	currency	character varying	varchar	3			NO	'KES'::character varying
+pricing_schedules	4	status	character varying	varchar	24			NO	'draft'::character varying
+pricing_schedules	5	effective_from	timestamp with time zone	timestamptz				YES	
+pricing_schedules	6	effective_until	timestamp with time zone	timestamptz				YES	
+pricing_schedules	7	created_by	uuid	uuid				NO	
+pricing_schedules	8	approved_by	uuid	uuid				YES	
+pricing_schedules	9	approved_at	timestamp with time zone	timestamptz				YES	
+pricing_schedules	10	created_at	timestamp with time zone	timestamptz				NO	now()
+privacy_legal_holds	1	id	uuid	uuid				NO	gen_random_uuid()
+privacy_legal_holds	2	reference	character varying	varchar	32			NO	
+privacy_legal_holds	3	subject_type	character varying	varchar	60			NO	
+privacy_legal_holds	4	subject_id	character varying	varchar	120			NO	
+privacy_legal_holds	5	reason_code	character varying	varchar	60			NO	
+privacy_legal_holds	6	authority_reference	character varying	varchar	180			YES	
+privacy_legal_holds	7	status	character varying	varchar	20			NO	'active'::character varying
+privacy_legal_holds	8	created_by	uuid	uuid				NO	
+privacy_legal_holds	9	released_by	uuid	uuid				YES	
+privacy_legal_holds	10	release_reason	character varying	varchar	1000			YES	
+privacy_legal_holds	11	created_at	timestamp with time zone	timestamptz				NO	now()
+privacy_legal_holds	12	released_at	timestamp with time zone	timestamptz				YES	
+privacy_retention_policies	1	id	uuid	uuid				NO	gen_random_uuid()
+privacy_retention_policies	2	record_class	character varying	varchar	80			NO	
+privacy_retention_policies	3	purpose	character varying	varchar	500			NO	
+privacy_retention_policies	4	retention_days	integer	int4		32	0	NO	
+privacy_retention_policies	5	legal_basis_review	character varying	varchar	24			NO	'pending'::character varying
+privacy_retention_policies	6	policy_version	character varying	varchar	40			NO	
+privacy_retention_policies	7	active	boolean	bool				NO	false
+privacy_retention_policies	8	approved_by	uuid	uuid				YES	
+privacy_retention_policies	9	approved_at	timestamp with time zone	timestamptz				YES	
+privacy_retention_policies	10	created_at	timestamp with time zone	timestamptz				NO	now()
+provider_operation_outbox	1	id	uuid	uuid				NO	gen_random_uuid()
+provider_operation_outbox	2	operation_type	character varying	varchar	16			NO	
+provider_operation_outbox	3	resource_id	uuid	uuid				NO	
+provider_operation_outbox	4	idempotency_key	character varying	varchar	120			NO	
+provider_operation_outbox	5	status	character varying	varchar	24			NO	'reserved'::character varying
+provider_operation_outbox	6	requested_by	uuid	uuid				NO	
+provider_operation_outbox	7	attempt_count	integer	int4		32	0	NO	0
+provider_operation_outbox	8	provider_reference	character varying	varchar	180			YES	
+provider_operation_outbox	9	http_status	integer	int4		32	0	YES	
+provider_operation_outbox	10	dispatch_started_at	timestamp with time zone	timestamptz				YES	
+provider_operation_outbox	11	resolved_at	timestamp with time zone	timestamptz				YES	
+provider_operation_outbox	12	created_at	timestamp with time zone	timestamptz				NO	now()
+provider_operation_outbox	13	updated_at	timestamp with time zone	timestamptz				NO	now()
+provider_reversal_cases	1	id	uuid	uuid				NO	gen_random_uuid()
+provider_reversal_cases	2	payment_transaction_id	uuid	uuid				NO	
+provider_reversal_cases	3	reversal_type	character varying	varchar	24			NO	
+provider_reversal_cases	4	amount_kes	numeric	numeric		14	2	NO	
+provider_reversal_cases	5	provider_reference	character varying	varchar	180			NO	
+provider_reversal_cases	6	evidence_reference	character varying	varchar	500			NO	
+provider_reversal_cases	7	evidence_hash	character varying	varchar	64			NO	
+provider_reversal_cases	8	reported_by	uuid	uuid				NO	
+provider_reversal_cases	9	status	character varying	varchar	24			NO	'received'::character varying
+provider_reversal_cases	10	reviewed_by	uuid	uuid				YES	
+provider_reversal_cases	11	review_note	character varying	varchar	1500			YES	
+provider_reversal_cases	12	reported_at	timestamp with time zone	timestamptz				NO	now()
+provider_reversal_cases	13	reviewed_at	timestamp with time zone	timestamptz				YES	
+provider_statement_evidence	1	id	uuid	uuid				NO	gen_random_uuid()
+provider_statement_evidence	2	provider	character varying	varchar	32			NO	
+provider_statement_evidence	3	period_start	date	date				NO	
+provider_statement_evidence	4	period_end	date	date				NO	
+provider_statement_evidence	5	evidence_reference	character varying	varchar	500			NO	
+provider_statement_evidence	6	content_sha256	character varying	varchar	64			NO	
+provider_statement_evidence	7	declared_row_count	integer	int4		32	0	NO	
+provider_statement_evidence	8	uploaded_by	uuid	uuid				NO	
+provider_statement_evidence	9	status	character varying	varchar	24			NO	'received'::character varying
+provider_statement_evidence	10	reviewed_by	uuid	uuid				YES	
+provider_statement_evidence	11	review_note	character varying	varchar	1500			YES	
+provider_statement_evidence	12	created_at	timestamp with time zone	timestamptz				NO	now()
+provider_statement_evidence	13	reviewed_at	timestamp with time zone	timestamptz				YES	
+reconciliation_items	1	id	uuid	uuid				NO	gen_random_uuid()
+reconciliation_items	2	source	character varying	varchar	32			NO	
+reconciliation_items	3	external_reference	character varying	varchar	180			NO	
+reconciliation_items	4	internal_reference	character varying	varchar	180			YES	
+reconciliation_items	5	amount_kes	numeric	numeric		14	2	NO	
+reconciliation_items	6	variance_kes	numeric	numeric		14	2	NO	'0'::numeric
+reconciliation_items	7	status	character varying	varchar	24			NO	'unmatched'::character varying
+reconciliation_items	8	reviewed_by	uuid	uuid				YES	
+reconciliation_items	9	reviewed_at	timestamp with time zone	timestamptz				YES	
+reconciliation_items	10	evidence_ref	text	text				YES	
+reconciliation_items	11	created_at	timestamp with time zone	timestamptz				NO	now()
+reconciliation_items	12	expected_amount_kes	numeric	numeric		14	2	YES	
+reconciliation_items	13	provider_amount_kes	numeric	numeric		14	2	YES	
+reconciliation_items	14	currency	character varying	varchar	3			NO	'KES'::character varying
+reconciliation_items	15	reason_code	character varying	varchar	64			YES	
+reconciliation_items	16	resolution_note	text	text				YES	
+refund_requests	1	id	uuid	uuid				NO	gen_random_uuid()
+refund_requests	2	payment_transaction_id	uuid	uuid				NO	
+refund_requests	3	requested_by	uuid	uuid				NO	
+refund_requests	4	amount_kes	numeric	numeric		14	2	NO	
+refund_requests	5	reason	text	text				NO	
+refund_requests	6	destination_fingerprint	character varying	varchar	128			YES	
+refund_requests	7	status	character varying	varchar	24			NO	'requested'::character varying
+refund_requests	8	reviewed_by	uuid	uuid				YES	
+refund_requests	9	provider_reference	character varying	varchar	180			YES	
+refund_requests	10	provider_confirmed_at	timestamp with time zone	timestamptz				YES	
+refund_requests	11	created_at	timestamp with time zone	timestamptz				NO	now()
+refund_requests	12	destination_type	character varying	varchar	24			NO	'original_payer'::character varying
+refund_requests	13	original_payer_fingerprint	character varying	varchar	64			YES	
+refund_requests	14	idempotency_key	character varying	varchar	120			NO	(gen_random_uuid())::text
+refund_requests	15	provider_batch_id	character varying	varchar	180			YES	
+refund_requests	16	provider_transaction_id	character varying	varchar	180			YES	
+refund_requests	17	provider_outcome	character varying	varchar	24			YES	
+refund_requests	18	submitted_at	timestamp with time zone	timestamptz				YES	
+refund_requests	19	approved_at	timestamp with time zone	timestamptz				YES	
+refund_requests	20	executed_by	uuid	uuid				YES	
+refund_requests	21	reconciled_at	timestamp with time zone	timestamptz				YES	
+refund_requests	22	reconciliation_evidence_ref	text	text				YES	
+refund_requests	23	reconciliation_note	text	text				YES	
+refund_requests	24	updated_at	timestamp with time zone	timestamptz				NO	now()
+reports	1	id	uuid	uuid				NO	gen_random_uuid()
+reports	2	reference	character varying	varchar	24			NO	
+reports	3	kind	USER-DEFINED	report_kind				NO	
+reports	4	reporter_id	uuid	uuid				YES	
+reports	5	reporter_email	character varying	varchar	320			YES	
+reports	6	reporter_email_verified_at	timestamp with time zone	timestamptz				YES	
+reports	7	reporter_relationship	character varying	varchar	40			NO	'self'::character varying
+reports	8	subject_name	character varying	varchar	180			YES	
+reports	9	organisation_id	uuid	uuid				YES	
+reports	10	category	character varying	varchar	100			NO	
+reports	11	item_description	text	text				NO	
+reports	12	county	character varying	varchar	80			NO	
+reports	13	approximate_location	character varying	varchar	240			YES	
+reports	14	incident_date	date	date				YES	
+reports	15	status	USER-DEFINED	report_status				NO	'submitted'::report_status
+reports	16	public_listing_consent	boolean	bool				NO	false
+reports	17	public_description	text	text				YES	
+reports	18	private_metadata	jsonb	jsonb				NO	'{}'::jsonb
+reports	19	created_at	timestamp with time zone	timestamptz				NO	now()
+reports	20	updated_at	timestamp with time zone	timestamptz				NO	now()
+reward_authorizations	1	id	uuid	uuid				NO	gen_random_uuid()
+reward_authorizations	2	claim_id	uuid	uuid				NO	
+reward_authorizations	3	gross_kes	numeric	numeric		14	2	NO	
+reward_authorizations	4	funding_source	character varying	varchar	80			NO	
+reward_authorizations	5	source_reference	character varying	varchar	180			NO	
+reward_authorizations	6	evidence_ref	text	text				NO	
+reward_authorizations	7	status	character varying	varchar	24			NO	'pending_verification'::character varying
+reward_authorizations	8	created_by	uuid	uuid				NO	
+reward_authorizations	9	verified_by	uuid	uuid				YES	
+reward_authorizations	10	verified_at	timestamp with time zone	timestamptz				YES	
+reward_authorizations	11	created_at	timestamp with time zone	timestamptz				NO	now()
+risk_review_cases	1	id	uuid	uuid				NO	gen_random_uuid()
+risk_review_cases	2	reference	character varying	varchar	32			NO	
+risk_review_cases	3	subject_user_id	uuid	uuid				YES	
+risk_review_cases	4	subject_type	character varying	varchar	60			NO	
+risk_review_cases	5	subject_id	character varying	varchar	120			NO	
+risk_review_cases	6	signal_code	character varying	varchar	80			NO	
+risk_review_cases	7	signal_source	character varying	varchar	80			NO	
+risk_review_cases	8	signal_evidence_hash	character varying	varchar	64			YES	
+risk_review_cases	9	severity	character varying	varchar	16			NO	'low'::character varying
+risk_review_cases	10	status	character varying	varchar	24			NO	'open'::character varying
+risk_review_cases	11	assigned_to	uuid	uuid				YES	
+risk_review_cases	12	outcome	character varying	varchar	32			YES	
+risk_review_cases	13	rationale	character varying	varchar	1500			YES	
+risk_review_cases	14	created_by	uuid	uuid				NO	
+risk_review_cases	15	reviewed_by	uuid	uuid				YES	
+risk_review_cases	16	created_at	timestamp with time zone	timestamptz				NO	now()
+risk_review_cases	17	updated_at	timestamp with time zone	timestamptz				NO	now()
+risk_review_cases	18	resolved_at	timestamp with time zone	timestamptz				YES	
+risk_review_events	1	id	uuid	uuid				NO	gen_random_uuid()
+risk_review_events	2	case_id	uuid	uuid				NO	
+risk_review_events	3	actor_id	uuid	uuid				NO	
+risk_review_events	4	event_type	character varying	varchar	40			NO	
+risk_review_events	5	rationale	character varying	varchar	1500			NO	
+risk_review_events	6	evidence_hash	character varying	varchar	64			YES	
+risk_review_events	7	created_at	timestamp with time zone	timestamptz				NO	now()
+runtime_worker_heartbeats	1	worker_name	character varying	varchar	100			NO	
+runtime_worker_heartbeats	2	status	character varying	varchar	24			NO	'idle'::character varying
+runtime_worker_heartbeats	3	last_started_at	timestamp with time zone	timestamptz				YES	
+runtime_worker_heartbeats	4	last_completed_at	timestamp with time zone	timestamptz				YES	
+runtime_worker_heartbeats	5	last_failure_at	timestamp with time zone	timestamptz				YES	
+runtime_worker_heartbeats	6	last_error_code	character varying	varchar	80			YES	
+runtime_worker_heartbeats	7	successful_runs	bigint	int8		64	0	NO	0
+runtime_worker_heartbeats	8	failed_runs	bigint	int8		64	0	NO	0
+runtime_worker_heartbeats	9	updated_at	timestamp with time zone	timestamptz				NO	now()
+security_incident_assessments	1	id	uuid	uuid				NO	gen_random_uuid()
+security_incident_assessments	2	incident_id	uuid	uuid				NO	
+security_incident_assessments	3	assessed_by	uuid	uuid				NO	
+security_incident_assessments	4	affected_data_classes	jsonb	jsonb				NO	'[]'::jsonb
+security_incident_assessments	5	affected_people_estimate	integer	int4		32	0	YES	
+security_incident_assessments	6	access_confirmed	boolean	bool				NO	false
+security_incident_assessments	7	containment_at	timestamp with time zone	timestamptz				YES	
+security_incident_assessments	8	counsel_review_status	character varying	varchar	24			NO	'pending'::character varying
+security_incident_assessments	9	regulator_assessment_status	character varying	varchar	40			NO	'pending'::character varying
+security_incident_assessments	10	subject_notification_status	character varying	varchar	40			NO	'pending'::character varying
+security_incident_assessments	11	assessment_notes	character varying	varchar	3000			NO	
+security_incident_assessments	12	created_at	timestamp with time zone	timestamptz				NO	now()
+security_incidents	1	id	uuid	uuid				NO	gen_random_uuid()
+security_incidents	2	reference	character varying	varchar	24			NO	
+security_incidents	3	severity	character varying	varchar	16			NO	
+security_incidents	4	category	character varying	varchar	48			NO	
+security_incidents	5	summary	character varying	varchar	240			NO	
+security_incidents	6	details	text	text				NO	
+security_incidents	7	status	character varying	varchar	24			NO	'open'::character varying
+security_incidents	8	owner_id	uuid	uuid				YES	
+security_incidents	9	reported_by	uuid	uuid				YES	
+security_incidents	10	triaged_by	uuid	uuid				YES	
+security_incidents	11	resolution	text	text				YES	
+security_incidents	12	detected_at	timestamp with time zone	timestamptz				NO	now()
+security_incidents	13	updated_at	timestamp with time zone	timestamptz				NO	now()
+security_incidents	14	closed_at	timestamp with time zone	timestamptz				YES	
+settlement_allocation_reviews	1	id	uuid	uuid				NO	gen_random_uuid()
+settlement_allocation_reviews	2	settlement_id	uuid	uuid				NO	
+settlement_allocation_reviews	3	reviewed_policy_version	character varying	varchar	48			NO	
+settlement_allocation_reviews	4	snapshot_finder_percent	integer	int4		32	0	NO	
+settlement_allocation_reviews	5	snapshot_agent_percent	integer	int4		32	0	NO	
+settlement_allocation_reviews	6	snapshot_platform_percent	integer	int4		32	0	NO	
+settlement_allocation_reviews	7	snapshot_finder_kes	numeric	numeric		14	2	NO	
+settlement_allocation_reviews	8	snapshot_agent_kes	numeric	numeric		14	2	NO	
+settlement_allocation_reviews	9	snapshot_platform_kes	numeric	numeric		14	2	NO	
+settlement_allocation_reviews	10	variance_detected	boolean	bool				NO	
+settlement_allocation_reviews	11	review_status	character varying	varchar	24			NO	'recorded'::character varying
+settlement_allocation_reviews	12	reviewed_by	uuid	uuid				NO	
+settlement_allocation_reviews	13	review_note	character varying	varchar	1500			NO	
+settlement_allocation_reviews	14	created_at	timestamp with time zone	timestamptz				NO	now()
+settlements	1	id	uuid	uuid				NO	gen_random_uuid()
+settlements	2	claim_id	uuid	uuid				NO	
+settlements	3	finder_user_id	uuid	uuid				NO	
+settlements	4	agent_user_id	uuid	uuid				NO	
+settlements	5	gross_kes	numeric	numeric		14	2	NO	
+settlements	6	finder_kes	numeric	numeric		14	2	NO	
+settlements	7	agent_kes	numeric	numeric		14	2	NO	
+settlements	8	platform_kes	numeric	numeric		14	2	NO	
+settlements	9	finder_percent	integer	int4		32	0	NO	33
+settlements	10	agent_percent	integer	int4		32	0	NO	25
+settlements	11	platform_percent	integer	int4		32	0	NO	42
+settlements	12	status	USER-DEFINED	settlement_status				NO	'ineligible'::settlement_status
+settlements	13	settle_at	timestamp with time zone	timestamptz				YES	
+settlements	14	approved_at	timestamp with time zone	timestamptz				YES	
+settlements	15	approved_by	uuid	uuid				YES	
+settlements	16	payout_initiated_at	timestamp with time zone	timestamptz				YES	
+settlements	17	created_at	timestamp with time zone	timestamptz				NO	now()
+settlements	18	approval_mode	character varying	varchar	24			YES	
+settlements	19	allocation_policy_version	character varying	varchar	48			NO	'legacy_snapshot_unversioned'::character varying
+settlements	20	allocation_snapshot_at	timestamp with time zone	timestamptz				YES	
+settlements	21	allocation_snapshot_source	character varying	varchar	32			NO	'legacy_existing'::character varying
+support_messages	1	id	uuid	uuid				NO	gen_random_uuid()
+support_messages	2	ticket_id	uuid	uuid				NO	
+support_messages	3	author_id	uuid	uuid				NO	
+support_messages	4	body	text	text				NO	
+support_messages	5	visibility	character varying	varchar	16			NO	'customer'::character varying
+support_messages	6	created_at	timestamp with time zone	timestamptz				NO	now()
+support_tickets	1	id	uuid	uuid				NO	gen_random_uuid()
+support_tickets	2	reference	character varying	varchar	24			NO	
+support_tickets	3	requester_id	uuid	uuid				NO	
+support_tickets	4	assigned_to	uuid	uuid				YES	
+support_tickets	5	related_report_id	uuid	uuid				YES	
+support_tickets	6	related_claim_id	uuid	uuid				YES	
+support_tickets	7	category	character varying	varchar	48			NO	
+support_tickets	8	subject	character varying	varchar	180			NO	
+support_tickets	9	description	text	text				NO	
+support_tickets	10	priority	character varying	varchar	16			NO	'normal'::character varying
+support_tickets	11	status	character varying	varchar	24			NO	'open'::character varying
+support_tickets	12	created_at	timestamp with time zone	timestamptz				NO	now()
+support_tickets	13	updated_at	timestamp with time zone	timestamptz				NO	now()
+third_party_payer_authorizations	1	id	uuid	uuid				NO	gen_random_uuid()
+third_party_payer_authorizations	2	payment_transaction_id	uuid	uuid				NO	
+third_party_payer_authorizations	3	claim_id	uuid	uuid				NO	
+third_party_payer_authorizations	4	claimant_user_id	uuid	uuid				NO	
+third_party_payer_authorizations	5	payer_relationship	character varying	varchar	24			NO	
+third_party_payer_authorizations	6	payer_fingerprint	character varying	varchar	64			NO	
+third_party_payer_authorizations	7	consent_confirmed	boolean	bool				NO	false
+third_party_payer_authorizations	8	consent_policy_version	character varying	varchar	48			NO	
+third_party_payer_authorizations	9	consent_text_hash	character varying	varchar	64			NO	
+third_party_payer_authorizations	10	attested_at	timestamp with time zone	timestamptz				NO	now()
+third_party_payer_authorizations	11	revoked_at	timestamp with time zone	timestamptz				YES	
+third_party_payer_authorizations	12	created_at	timestamp with time zone	timestamptz				NO	now()
+user_roles	1	id	uuid	uuid				NO	gen_random_uuid()
+user_roles	2	user_id	uuid	uuid				NO	
+user_roles	3	role	USER-DEFINED	user_role				NO	
+user_roles	4	granted_by	uuid	uuid				YES	
+user_roles	5	granted_at	timestamp with time zone	timestamptz				NO	now()
+user_roles	6	revoked_at	timestamp with time zone	timestamptz				YES	
+user_sessions	1	id	uuid	uuid				NO	gen_random_uuid()
+user_sessions	2	user_id	uuid	uuid				NO	
+user_sessions	3	token_hash	character varying	varchar	128			NO	
+user_sessions	4	expires_at	timestamp with time zone	timestamptz				NO	
+user_sessions	5	revoked_at	timestamp with time zone	timestamptz				YES	
+user_sessions	6	created_at	timestamp with time zone	timestamptz				NO	now()
+users	1	id	uuid	uuid				NO	gen_random_uuid()
+users	2	email	character varying	varchar	320			NO	
+users	3	full_name	character varying	varchar	180			YES	
+users	4	phone_masked	character varying	varchar	40			YES	
+users	5	email_verified_at	timestamp with time zone	timestamptz				YES	
+users	6	is_suspended	boolean	bool				NO	false
+users	7	created_at	timestamp with time zone	timestamptz				NO	now()
+users	8	updated_at	timestamp with time zone	timestamptz				NO	now()
+webhook_events	1	id	uuid	uuid				NO	gen_random_uuid()
+webhook_events	2	provider	character varying	varchar	40			NO	
+webhook_events	3	provider_event_id	character varying	varchar	180			NO	
+webhook_events	4	event_type	character varying	varchar	100			NO	
+webhook_events	5	received_at	timestamp with time zone	timestamptz				NO	now()
+webhook_events	6	processed_at	timestamp with time zone	timestamptz				YES	
+webhook_events	7	status	character varying	varchar	24			NO	'received'::character varying
+webhook_events	8	safe_metadata	jsonb	jsonb				NO	'{}'::jsonb
+(894 rows)

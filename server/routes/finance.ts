@@ -692,28 +692,68 @@ financeRouter.get("/claims/:claimId/assessment", async (req, res, next) => {
 // remains a separate, short-window action gated by sandbox provider and payment-safety controls.
 financeRouter.post("/assessments/:assessmentId/confirm", async (req, res, next) => {
   try {
-    const [assessment] = await db.select().from(paymentAssessments).where(eq(paymentAssessments.id, req.params.assessmentId)).limit(1);
-    if (!assessment) return res.status(404).json({ error: "Assessment not found" });
-    const [claim] = await db.select().from(claims).where(eq(claims.id, assessment.claimId)).limit(1);
-    if (!claim || claim.claimantId !== req.auth!.id) return res.status(403).json({ error: "Only the verified claimant may confirm this assessment" });
-    if (assessment.status !== "awaiting_claimant_confirmation" || claim.status !== "approved") return res.status(409).json({ error: "This assessment is not available for confirmation" });
-    const [inspection] = await db.select({ createdAt: custodyEvents.createdAt }).from(custodyEvents)
-      .innerJoin(assignments, and(eq(assignments.reportId, custodyEvents.reportId), eq(assignments.agentId, custodyEvents.agentId), eq(assignments.status, "assigned")))
-      .where(and(eq(custodyEvents.reportId, claim.reportId), eq(custodyEvents.eventType, "inspection_completed")))
-      .orderBy(desc(custodyEvents.createdAt)).limit(1);
-    const paymentWindowExpiresAt = inspection ? new Date(new Date(inspection.createdAt).getTime() + 24 * 60 * 60 * 1000) : null;
-    const [updated] = await db.update(paymentAssessments).set({ status: "claimant_confirmed", confirmedBy: req.auth!.id, confirmedAt: new Date(), paymentWindowExpiresAt })
-      .where(and(eq(paymentAssessments.id, assessment.id), eq(paymentAssessments.status, "awaiting_claimant_confirmation"))).returning();
-    if (!updated) return res.status(409).json({ error: "Assessment has already changed; refresh and review the current status" });
-    await db.insert(auditEvents).values({ actorId: req.auth!.id, action: "finance.assessment_confirmed_by_claimant", resourceType: "payment_assessment", resourceId: assessment.id, outcome: "success", metadata: { amountKes: assessment.amountKes, currency: "KES" } });
-    res.json({ assessment: updated, notice: "Your confirmation was recorded. The 24-hour payment window opens after the assigned Agent records physical receipt and completes the item inspection. No charge has been made." });
+    // Keep claimant consent, the assessment state change and its audit event in one
+    // transaction. The lock order is report -> claim -> active assignment -> assessment,
+    // matching the custody/release workflows and serializing against claim/assignment changes.
+    const result = await db.transaction(async tx => {
+      const [assessmentReference] = await tx.select({ claimId: paymentAssessments.claimId }).from(paymentAssessments)
+        .where(eq(paymentAssessments.id, req.params.assessmentId)).limit(1);
+      if (!assessmentReference) return fail(404, "Assessment not found");
+      const [candidate] = await tx.select({ reportId: claims.reportId }).from(claims)
+        .where(eq(claims.id, assessmentReference.claimId)).limit(1);
+      if (!candidate) return fail(404, "Related claim not found");
+
+      const [report] = await tx.select({ id: reports.id }).from(reports)
+        .where(eq(reports.id, candidate.reportId)).limit(1).for("update");
+      if (!report) return fail(404, "Related report not found");
+
+      const [claim] = await tx.select().from(claims)
+        .where(eq(claims.id, assessmentReference.claimId)).limit(1).for("update");
+      if (!claim || claim.reportId !== candidate.reportId || claim.claimantId !== req.auth!.id) {
+        return fail(403, "Only the verified claimant may confirm this assessment");
+      }
+      if (claim.status !== "approved") return fail(409, "This assessment is not available for confirmation");
+
+      const [assignment] = await tx.select({ agentId: assignments.agentId }).from(assignments)
+        .where(and(eq(assignments.reportId, claim.reportId), eq(assignments.status, "assigned")))
+        .limit(1).for("update");
+
+      const [assessment] = await tx.select().from(paymentAssessments)
+        .where(and(eq(paymentAssessments.id, req.params.assessmentId), eq(paymentAssessments.claimId, claim.id)))
+        .limit(1).for("update");
+      if (!assessment) return fail(404, "Assessment not found");
+      if (assessment.status !== "awaiting_claimant_confirmation") {
+        return fail(409, "This assessment is not available for confirmation");
+      }
+
+      const [inspection] = assignment ? await tx.select({ createdAt: custodyEvents.createdAt }).from(custodyEvents)
+        .where(and(eq(custodyEvents.reportId, claim.reportId), eq(custodyEvents.agentId, assignment.agentId), eq(custodyEvents.eventType, "inspection_completed")))
+        .orderBy(desc(custodyEvents.createdAt)).limit(1) : [undefined];
+      const paymentWindowExpiresAt = inspection ? new Date(new Date(inspection.createdAt).getTime() + 24 * 60 * 60 * 1000) : null;
+      const [updated] = await tx.update(paymentAssessments)
+        .set({ status: "claimant_confirmed", confirmedBy: req.auth!.id, confirmedAt: new Date(), paymentWindowExpiresAt })
+        .where(and(eq(paymentAssessments.id, assessment.id), eq(paymentAssessments.status, "awaiting_claimant_confirmation")))
+        .returning();
+      if (!updated) return fail(409, "Assessment has already changed; refresh and review the current status");
+
+      await tx.insert(auditEvents).values({
+        actorId: req.auth!.id,
+        action: "finance.assessment_confirmed_by_claimant",
+        resourceType: "payment_assessment",
+        resourceId: assessment.id,
+        outcome: "success",
+        metadata: { amountKes: assessment.amountKes, currency: "KES" }
+      });
+      return succeed({ assessment: updated });
+    });
+    if (isRouteFailure(result)) return res.status(result.status).json({ error: result.error });
+    res.json({
+      assessment: result.value.assessment,
+      notice: "Your confirmation was recorded. The 24-hour payment window opens after the assigned Agent records physical receipt and completes the item inspection. No charge has been made."
+    });
   } catch (error) { next(error); }
 });
 
-
-
-// Read-only candidate matching uses the exact internal transaction UUID written by
-// recordCollectionException(). It never marks an item reconciled or mutates finance data.
 financeRouter.get("/reconciliation/matching-candidates", requireRole("admin", "owner"), async (req, res, next) => {
   try {
     const parsed = z.object({ limit: z.coerce.number().int().min(1).max(300).default(100), offset: z.coerce.number().int().min(0).max(100000).default(0) }).strict().safeParse(req.query);
