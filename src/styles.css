@@ -183,25 +183,26 @@ body { color: #183124; background: #faf9f5; }
 .nav-link { color: #405647; }
 .nav-link:hover { color: #df5f12; }
 .btn-primary {
-  border: 1px solid #f47721;
-  background: #f47721;
-  color: #123b2a;
+  border: 1px solid #195936;
+  background: #195936;
+  color: #ffffff;
   font-weight: 750;
 }
-.btn-primary:hover { background: #ff9447; border-color: #ff9447; color: #092719; }
+.btn-primary:hover { background: #123b2a; border-color: #123b2a; color: #ffffff; }
 .btn-primary:disabled { background: #cbd3c6; border-color: #cbd3c6; color: #586b5e; }
+.btn-primary:focus-visible { outline: 3px solid rgba(244,119,33,.5); outline-offset: 2px; }
 .btn-secondary {
   border: 1px solid #b9c9ba;
   background: #fffefa;
   color: #195936;
 }
-.btn-secondary:hover { border-color: #f47721; background: #fff5eb; color: #923b14; }
+.btn-secondary:hover { border-color: #195936; background: #edf5ee; color: #123b2a; }
 .btn-outline {
   border: 1px solid rgba(255, 180, 119, .8);
   color: #fffefa;
   background: rgba(255, 255, 255, .035);
 }
-.btn-outline:hover { border-color: #ff9447; background: #f47721; color: #123b2a; }
+.btn-outline:hover { border-color: #ffb477; background: rgba(255,180,119,.12); color: #ffb477; }
 .theme-toggle {
   border-color: #b9c9ba;
   background: #fffefa;
@@ -261,12 +262,12 @@ html[data-theme="dark"] .nav-link,
 html[data-theme="dark"] .quick-action { color: #c4d6c7; }
 html[data-theme="dark"] .nav-link:hover,
 html[data-theme="dark"] .quick-action:hover { color: #ffb477; background: #193526; }
-html[data-theme="dark"] .btn-primary { background: #f47721; border-color: #f47721; color: #092719; }
-html[data-theme="dark"] .btn-primary:hover { background: #ff9447; border-color: #ff9447; }
+html[data-theme="dark"] .btn-primary { background: #216d42; border-color: #216d42; color: #ffffff; }
+html[data-theme="dark"] .btn-primary:hover { background: #2c8050; border-color: #2c8050; color: #ffffff; }
 html[data-theme="dark"] .btn-secondary,
 html[data-theme="dark"] .theme-toggle { background: #193526; border-color: #456451; color: #dce9de; }
 html[data-theme="dark"] .btn-secondary:hover,
-html[data-theme="dark"] .theme-toggle:hover { background: #254532; border-color: #f47721; color: #ffb477; }
+html[data-theme="dark"] .theme-toggle:hover { background: #254532; border-color: #5d9a70; color: #ffffff; }
 html[data-theme="dark"] .btn-outline { border-color: rgba(255, 180, 119, .75); color: #edf5ee; }
 html[data-theme="dark"] .btn-outline:hover { background: #f47721; border-color: #f47721; color: #092719; }
 html[data-theme="dark"] .status-positive { background: #194b32; color: #dceee1; }
