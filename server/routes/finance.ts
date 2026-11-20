@@ -696,18 +696,19 @@ financeRouter.post("/assessments/:assessmentId/confirm", async (req, res, next) 
     // transaction. The lock order is report -> claim -> active assignment -> assessment,
     // matching the custody/release workflows and serializing against claim/assignment changes.
     const result = await db.transaction(async tx => {
+      const [assessmentReference] = await tx.select({ claimId: paymentAssessments.claimId }).from(paymentAssessments)
+        .where(eq(paymentAssessments.id, req.params.assessmentId)).limit(1);
+      if (!assessmentReference) return fail(404, "Assessment not found");
       const [candidate] = await tx.select({ reportId: claims.reportId }).from(claims)
-        .where(eq(claims.id, req.params.assessmentId ? sql`(select claim_id from payment_assessments where id = ${req.params.assessmentId})` : sql`null`))
-        .limit(1);
-      if (!candidate) return fail(404, "Assessment not found");
+        .where(eq(claims.id, assessmentReference.claimId)).limit(1);
+      if (!candidate) return fail(404, "Related claim not found");
 
       const [report] = await tx.select({ id: reports.id }).from(reports)
         .where(eq(reports.id, candidate.reportId)).limit(1).for("update");
       if (!report) return fail(404, "Related report not found");
 
       const [claim] = await tx.select().from(claims)
-        .where(eq(claims.id, sql`(select claim_id from payment_assessments where id = ${req.params.assessmentId})`))
-        .limit(1).for("update");
+        .where(eq(claims.id, assessmentReference.claimId)).limit(1).for("update");
       if (!claim || claim.reportId !== candidate.reportId || claim.claimantId !== req.auth!.id) {
         return fail(403, "Only the verified claimant may confirm this assessment");
       }
