@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import {
-  ShieldCheck, Search, FilePlus2, LayoutDashboard, LogOut, ArrowRight, MapPin,
+  Search, FilePlus2, LayoutDashboard, LogOut, ArrowRight, MapPin,
   Clock3, Menu, X, Bell, Building2, PackageCheck, ClipboardList, Users,
   AlertTriangle, CheckCircle2, ChevronRight, LockKeyhole, Wallet, CircleHelp, Sun, Moon
 } from "lucide-react";
