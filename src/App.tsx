@@ -86,8 +86,7 @@ export default function App() {
       {DEMO_MODE && <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-xs font-semibold tracking-wide text-amber-900">DEMONSTRATION MODE · SAMPLE DATA ONLY · NO REAL REPORTS OR PAYMENTS</div>}
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3.5">
         <button onClick={() => navigate("home")} className="flex items-center gap-3 text-left" aria-label="Return4me home">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#101c32] text-white"><ShieldCheck size={22}/></span>
-          <span><strong className="block text-lg tracking-tight">Return4me</strong><small className="text-xs text-slate-500">Find your way back.</small></span>
+          <img src="/assets/logo_wordmark_transparent.png" alt="Return4me — Find your way back." className="h-9 w-auto max-w-[172px] object-contain" />
         </button>
         <div className="flex items-center gap-2">
           <button className="theme-toggle" type="button" onClick={() => setTheme(current => current === "dark" ? "light" : "dark")} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`} title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>{theme === "dark" ? <Sun size={18}/> : <Moon size={18}/>}<span className="hidden sm:inline">{theme === "dark" ? "Light" : "Dark"} theme</span></button>
@@ -130,7 +129,7 @@ export default function App() {
 
     <footer className="mt-16 border-t border-slate-200 bg-white">
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 md:grid-cols-[1.5fr_1fr_1fr]">
-        <div><div className="flex items-center gap-2 font-semibold"><ShieldCheck className="text-blue-700"/> Return4me</div><p className="mt-3 max-w-sm text-sm leading-6 text-slate-500">A coordinated lost-and-found service connecting people with authorised recovery support across Kenya.</p><p className="mt-4 text-xs text-slate-400">Operated by Elligrace Technologies Limited.</p></div>
+        <div><div className="flex items-center"><img src="/assets/logo_wordmark_transparent.png" alt="Return4me" className="h-8 w-auto max-w-[160px] object-contain" /></div><p className="mt-3 max-w-sm text-sm leading-6 text-slate-500">A coordinated lost-and-found service connecting people with authorised recovery support across Kenya.</p><p className="mt-4 text-xs text-slate-400">Operated by Elligrace Technologies Limited.</p></div>
         <div><h3 className="text-sm font-semibold">Explore</h3><div className="mt-3 flex flex-col items-start gap-2">{link("I found something", "report-found")}{link("I lost something", "report-lost")}{link("For organisations", "organisations")}{link("Become an Agent", "agent")}{link("How it works", "how")}</div></div>
         <div><h3 className="text-sm font-semibold">Information</h3><div className="mt-3 flex flex-col items-start gap-2">{link("Pricing", "pricing")}{link("Help and Contact", "help")}{link("Sign in", "signin")}</div></div>
       </div>
