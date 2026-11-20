@@ -33,7 +33,7 @@
 | 67H | Serialize appointment request/confirm/decline against claim, assignment and hold changes; make appointment audits atomic; correct current-assignment workspace indicators | Source added; PostgreSQL/API/concurrency/appointment-race acceptance pending |
 | 67I | Serialize collection-code issuance with report/claim/assignment/appointment state; require current confirmed appointment, paid claim, current identity check and no active dispute/legal hold; expire code no later than appointment end | Source added; PostgreSQL/API/concurrency and delivery acceptance pending |
 | 67J | Appointment expiry, cancellation/rescheduling, collection-authorisation invalidation, manual no-show and claimant-visible outcomes | Source added; GitHub CI and user-reported local verification passed; dedicated API/PostgreSQL/concurrency/browser and independent acceptance pending |
-| 67K | Transactional claimant assessment confirmation; serialize against report/claim/assignment changes; commit audit atomically | Source added; CI and local verification pending |
+| 67K | Transactional claimant assessment confirmation; serialize against report/claim/assignment changes; commit audit atomically | Source added; GitHub CI run 44820289813 passed (36 test files / 171 tests); local verification pending |
 | 67L onward | Remaining source implementation gaps from the cumulative inventory | Pending |
 | 68 | Final cross-stage integration review and implementation freeze after source gaps close | Pending |
 | 69 | Consolidated tests, controlled database replay, security/accessibility/performance verification and independent acceptance | Deferred until Batch 68 and explicit user authorization |
@@ -52,7 +52,7 @@ No production migration, provider call, payment, refund, payout, message, public
 
 ## Next implementation work
 
-Batch 67J source implementation is complete and its CI checks passed. Any remaining source gaps from the cumulative inventory must be addressed as Batch 67K onward before Batch 68. Batch 68 is not a substitute for implementation. Batch 69 may begin only after all source implementation work and Batch 68 freeze are complete, with disposable infrastructure and separately authorised provider sandbox credentials. Live provider operations and production actions remain disabled.
+Batches 67J and 67K source implementation is complete for their scoped changes and their CI checks passed. Any remaining source gaps from the cumulative inventory must be addressed as Batch 67L onward before Batch 68. Batch 68 is not a substitute for implementation. Batch 69 may begin only after all source implementation work and Batch 68 freeze are complete, with disposable infrastructure and separately authorised provider sandbox credentials. Live provider operations and production actions remain disabled.
 
 
 ## Batch 67E implementation details
@@ -107,4 +107,4 @@ No migration was added. The existing appointment status vocabulary is retained. 
 
 The claimant assessment-confirmation route in `server/routes/finance.ts` now performs the consent-state transition and its audit insert in one database transaction. It follows the report -> claim -> active assignment -> assessment row-lock order, rechecks that the signed-in user is the claimant and that the claim remains approved, and uses an inspection event associated with the current active assignment when calculating the existing payment-window expiry. The endpoint still records consent only; it does not initiate or request a payment. No schema change or migration was added. A focused source-contract test covers transaction coupling, lock order and in-transaction ownership/status checks in `server/tests/batch67k-assessment-confirmation.test.ts`.
 
-CI and local verification for Batch 67K are pending. PostgreSQL/API concurrency proof, claimant browser journey and independent financial acceptance remain pending. INT-009 remains NOT_VERIFIED until the complete payment/ledger/provider integration evidence is accepted. No provider call, money movement, production migration or deployment was performed.
+GitHub Actions run 44820289813 passed on 21 November 2026: verify:all, TypeScript, disposable PostgreSQL migration replay, 36 Vitest files / 171 tests, production build and npm audit --audit-level=high. The focused Batch 67K source-contract tests are included in that suite. Local verification, dedicated claimant assessment API/PostgreSQL concurrency proof, browser journey and independent financial acceptance remain pending. INT-009 remains NOT_VERIFIED until the complete payment/ledger/provider integration evidence is accepted. No provider call, money movement, production migration or deployment was performed.
