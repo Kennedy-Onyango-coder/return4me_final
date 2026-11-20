@@ -32,7 +32,7 @@
 | 67G | Serialize claimant confirmation, final Agent release and claim/report/assignment legal holds using a shared lock order; bind completion notification to the exact completed claim | Source added; PostgreSQL/API/concurrency/hold-race acceptance pending |
 | 67H | Serialize appointment request/confirm/decline against claim, assignment and hold changes; make appointment audits atomic; correct current-assignment workspace indicators | Source added; PostgreSQL/API/concurrency/appointment-race acceptance pending |
 | 67I | Serialize collection-code issuance with report/claim/assignment/appointment state; require current confirmed appointment, paid claim, current identity check and no active dispute/legal hold; expire code no later than appointment end | Source added; PostgreSQL/API/concurrency and delivery acceptance pending |
-| 67J | Appointment expiry, cancellation/rescheduling, collection-authorisation invalidation, manual no-show and claimant-visible outcomes | Source added; CI/local/API/PostgreSQL/concurrency/UI acceptance pending |
+| 67J | Appointment expiry, cancellation/rescheduling, collection-authorisation invalidation, manual no-show and claimant-visible outcomes | Source added; GitHub CI passed on 21 November 2026; local/API/PostgreSQL/concurrency/browser and independent acceptance pending |
 | 67K onward | Remaining source implementation gaps | Pending |
 | 68 | Final cross-stage integration review and implementation freeze after source gaps close | Pending |
 | 69 | Consolidated tests, controlled database replay, security/accessibility/performance verification and independent acceptance | Deferred until Batch 68 and explicit user authorization |
@@ -45,13 +45,13 @@ This source change addresses a possible race in which evidence could be changed 
 
 ## Verification policy and current record
 
-The baseline archive passed ZIP integrity inspection. Batches 67D–67I source and governance edits were made. No application tests, static verifier scripts, typecheck, lint, build, PostgreSQL, migration replay, API, browser, concurrency, security, performance, accessibility or provider sandbox checks were run, in accordance with the instruction to defer testing until all implementation stages are complete.
+The baseline archive passed ZIP integrity inspection. Batches 67D–67I source and governance edits were made without runtime verification at that stage. Batch 67J was subsequently verified by GitHub Actions run 44818456352 on commit 0030ebd5a447952dd54162e2bd64e190aa3b14ed: verify:all (including the Batch 67J source verifier), typecheck, disposable CI database migration, 35 Vitest files / 168 tests, production build and npm audit --audit-level=high all passed. The build emitted the existing large-chunk warning; npm audit reported moderate-severity dependency findings but no high-severity failure. This CI run is not a substitute for local verification, dedicated appointment API/PostgreSQL concurrency/browser acceptance or independent acceptance.
 
 No production migration, provider call, payment, refund, payout, message, publication, item release, deployment, commit or push was performed. Migration 0022 remains prepared and unapplied. All 173 independent acceptance decisions remain PENDING. Production release remains NOT_AUTHORISED.
 
 ## Next implementation work
 
-Batch 67J should continue with appointment expiry/no-show, cancellation/rescheduling, claimant-visible Agent decisions and invalidation of authorisations when appointments change. Batch 68 is not a substitute for implementation. Batch 69 may begin only after all source implementation work and Batch 68 freeze are complete, with disposable infrastructure and separately authorised provider sandbox credentials. Live provider operations and production actions remain disabled.
+Batch 67J source implementation is complete and its CI checks passed. Any remaining source gaps from the cumulative inventory must be addressed as Batch 67K onward before Batch 68. Batch 68 is not a substitute for implementation. Batch 69 may begin only after all source implementation work and Batch 68 freeze are complete, with disposable infrastructure and separately authorised provider sandbox credentials. Live provider operations and production actions remain disabled.
 
 
 ## Batch 67E implementation details
@@ -99,4 +99,4 @@ Claimants and the currently assigned active verified Agent may cancel a requeste
 
 The new manual no-show endpoint requires the current approved claim, active verified Agent assignment, exact appointment/claim/assignment binding, confirmed status and ends_at <= now(). It has no automatic timer, no grace period and no claimant/Admin no-show path. Claimant and Agent workspaces now expose appointment outcomes and the permitted actions.
 
-No migration was added. The existing appointment status vocabulary is retained. Source-level tests and a dedicated source verifier were added; execution and runtime acceptance are pending until the verification stage. All independent acceptance decisions remain pending and production release remains not authorised.
+No migration was added. The existing appointment status vocabulary is retained. Source-level tests and a dedicated source verifier were added. GitHub Actions run 44818456352 passed on commit 0030ebd5a447952dd54162e2bd64e190aa3b14ed: verify:all (including verify:batch67j), typecheck, disposable CI migration, 35 test files / 168 tests, build and npm audit --audit-level=high. The build retains the existing large-chunk warning and audit reports moderate findings only. Local verification, dedicated appointment API/PostgreSQL concurrency/browser testing and independent acceptance remain pending. All independent acceptance decisions remain pending and production release remains not authorised.
