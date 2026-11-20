@@ -1,12 +1,12 @@
-# Return4me master roadmap — updated through Batch 67I
+# Return4me master roadmap — updated through Batch 67J
 
-**Date:** 18 November 2026  
-**Source baseline:** Cumulative Batches 59–67C archive, with Batch 67D, 67E, 67F, 67G, 67H and 67I source additions recorded in this package.  
+**Date:** 21 November 2026  
+**Source baseline:** Cumulative Batches 59–67C archive, with Batch 67D, 67E, 67F, 67G, 67H, 67I and 67J source additions recorded in this package.  
 **Overall status:** Implementation in progress; not accepted and not production ready.
 
 ## Stage status
 
-| Stage | Scope | Status after Batch 67E |
+| Stage | Scope | Status after Batch 67J |
 |---|---|---|
 | 1–10 | Product foundations, identity, reports, claims, matching, custody, Agents, organisations and trust | PARTIAL — claim evidence review/approval and duplicate claim-submission serialization improved; remaining lifecycle and UI gaps remain |
 | 11 | Admin and Owner governance | PARTIAL |
@@ -32,7 +32,8 @@
 | 67G | Serialize claimant confirmation, final Agent release and claim/report/assignment legal holds using a shared lock order; bind completion notification to the exact completed claim | Source added; PostgreSQL/API/concurrency/hold-race acceptance pending |
 | 67H | Serialize appointment request/confirm/decline against claim, assignment and hold changes; make appointment audits atomic; correct current-assignment workspace indicators | Source added; PostgreSQL/API/concurrency/appointment-race acceptance pending |
 | 67I | Serialize collection-code issuance with report/claim/assignment/appointment state; require current confirmed appointment, paid claim, current identity check and no active dispute/legal hold; expire code no later than appointment end | Source added; PostgreSQL/API/concurrency and delivery acceptance pending |
-| 67J onward | Remaining source implementation gaps | Pending |
+| 67J | Appointment expiry, cancellation/rescheduling, collection-authorisation invalidation, manual no-show and claimant-visible outcomes | Source added; CI/local/API/PostgreSQL/concurrency/UI acceptance pending |
+| 67K onward | Remaining source implementation gaps | Pending |
 | 68 | Final cross-stage integration review and implementation freeze after source gaps close | Pending |
 | 69 | Consolidated tests, controlled database replay, security/accessibility/performance verification and independent acceptance | Deferred until Batch 68 and explicit user authorization |
 
@@ -88,3 +89,14 @@ No tests, typecheck, build, lint, database, migration replay, API, browser, conc
 `server/routes/agent-operations.ts` now issues claimant collection codes under a consistent report -> claim -> assignment -> appointment lock order. Issuance rechecks the currently approved claim, current active verified Agent assignment, exact claim/assignment identity check, a confirmed future appointment beginning within 24 hours and ending in the future, provider-confirmed paid assessment, and absence of active release-holding disputes or legal holds on claim/report/assignment. The authorization expires at the earlier of 24 hours or the appointment end. Delivery failure invalidates only the authorization for that exact claim and assignment. This prevents stale, held or unpaid appointment contexts from receiving a usable code. No schema or migration change.
 
 No tests, typecheck, build, lint, database, migration replay, API, browser, concurrency, security, performance, accessibility or provider sandbox checks were run. All remain deferred by instruction. Appointment cancellation/rescheduling/no-show lifecycle is not implemented by this batch and remains an open item for subsequent source work.
+
+
+## Batch 67J implementation details
+
+server/routes/agent-operations.ts now lazily expires overdue **requested** appointments by changing them to the existing cancelled status and writing an audit event in the same transaction when claimant or Agent appointment workspaces are loaded. The new-request path also expires an overdue request for that exact claim/assignment before checking for an active appointment. It does not introduce an expired status and does not automatically change confirmed appointments to no_show.
+
+Claimants and the currently assigned active verified Agent may cancel a requested or confirmed appointment. A confirmed appointment cannot be cancelled after its scheduled end; only the currently assigned Agent may then record a no-show. Cancellation and no-show both invalidate any unused claimant_collection authorisation for the exact report, claim and assignment in the same transaction as the appointment outcome and audit event. Rescheduling is a fresh appointment request after cancellation; an active requested/confirmed appointment blocks another request.
+
+The new manual no-show endpoint requires the current approved claim, active verified Agent assignment, exact appointment/claim/assignment binding, confirmed status and ends_at <= now(). It has no automatic timer, no grace period and no claimant/Admin no-show path. Claimant and Agent workspaces now expose appointment outcomes and the permitted actions.
+
+No migration was added. The existing appointment status vocabulary is retained. Source-level tests and a dedicated source verifier were added; execution and runtime acceptance are pending until the verification stage. All independent acceptance decisions remain pending and production release remains not authorised.
